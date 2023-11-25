@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.api" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.api.persistence" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.app" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.domain" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.infra" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.infra.persistence" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.infra.web" />
+            <option value="$PROJECT_DIR$/com.issue.tracker.web" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
