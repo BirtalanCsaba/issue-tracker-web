@@ -1,0 +1,20 @@
+[versions]
+kotlin = "1.8.22"
+slf4jLog4j = "2.0.9"
+jakarta = "10.0.0"
+hibernateJpaModelgen = "6.3.1.Final"
+jetbrainsKotlinx = "0.4.0"
+jackson = "2.16.0"
+
+[libraries]
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+slf4j-log4j = { group = "org.slf4j", name = "slf4j-reload4j", version.ref = "slf4jLog4j" }
+jakarta-ee = { group = "jakarta.platform", name = "jakarta.jakartaee-api", version.ref = "jakarta" }
+hibernate-jpamodelgen = { group = "org.hibernate.orm", name = "hibernate-jpamodelgen", version.ref = "hibernateJpaModelgen" }
+jetbrains-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "jetbrainsKotlinx" }
+fasterxml-jackson = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
+fasterxml-jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+spring-security-crypto = { group = "org.springframework.security", name = "spring-security-crypto", version = "6.2.0" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
