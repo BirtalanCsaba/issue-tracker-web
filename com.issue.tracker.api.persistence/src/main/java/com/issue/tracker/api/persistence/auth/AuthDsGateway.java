@@ -1,8 +1,8 @@
 package com.issue.tracker.api.persistence.auth;
 
-import jakarta.ejb.Local;
+import jakarta.ejb.Remote;
 
-@Local
+@Remote
 public interface AuthDsGateway {
     boolean existsByUsernameAndPassword(String username, String password);
 

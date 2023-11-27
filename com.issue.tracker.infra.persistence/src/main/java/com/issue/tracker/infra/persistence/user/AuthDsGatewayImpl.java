@@ -19,7 +19,7 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
     public boolean existsByUsernameAndPassword(String username, String password) {
         String encryptedPassword = BCryptManager.encrypt(password);
 
-        String queryString = "select exists(u) from UserEntity u where username=:username and password=:password";
+        String queryString = "select count(u) > 0 from UserEntity u where username=:username and password=:password";
 
         Query query = entityManager.createQuery(queryString);
         query.setParameter("username", username);

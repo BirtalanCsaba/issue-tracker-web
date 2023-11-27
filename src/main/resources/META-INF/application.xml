@@ -1,0 +1,30 @@
+<application version="5" xmlns="http://java.sun.com/xml/ns/javaee"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="
+      http://java.sun.com/xml/ns/javaee
+      http://java.sun.com/xml/ns/javaee/application_5.xsd">
+    <module>
+        <ejb>com.issue.tracker.infra.web.war</ejb>
+    </module>
+    <module>
+        <ejb>com.issue.tracker.infra.persistence.jar</ejb>
+    </module>
+    <module>
+        <ejb>com.issue.tracker.api.jar</ejb>
+    </module>
+    <module>
+        <ejb>com.issue.tracker.infra.jar</ejb>
+    </module>
+    <module>
+        <ejb>com.issue.tracker.api.persistence.jar</ejb>
+    </module>
+    <module>
+        <ejb>com.issue.tracker.domain.jar</ejb>
+    </module>
+    <module>
+        <web>
+            <web-uri>com.issue.tracker.infra.web.war</web-uri>
+            <context-root>issue-tracker</context-root>
+        </web>
+    </module>
+</application>

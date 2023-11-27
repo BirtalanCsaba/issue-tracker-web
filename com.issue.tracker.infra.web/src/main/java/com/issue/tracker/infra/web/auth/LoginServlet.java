@@ -18,25 +18,37 @@ public class LoginServlet extends HttpServlet {
     private AuthInput authInteractor;
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String body = ServletUtils.readBody(req.getReader());
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        String body;
+        try {
+            body = ServletUtils.readBody(req.getReader());
+        } catch (Exception ex) {
+            resp.setStatus(404);
+            return;
+        }
+
 
         LoginRequestModel requestBody;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             requestBody = objectMapper.readValue(body, LoginRequestModel.class);
-        } catch (RuntimeException ex) {
-            resp.setStatus(404);
+        } catch (Exception ex) {
+            resp.setStatus(500);
             return;
         }
 
         if (requestBody == null) {
-            resp.setStatus(404);
+            resp.setStatus(500);
             return;
         }
 
         try {
-            authInteractor.login(requestBody);
+            boolean authenticated = authInteractor.login(requestBody);
+            if (!authenticated) {
+                resp.setStatus(404);
+                return;
+            }
+            resp.setStatus(200);
         } catch (RuntimeException ex) {
             resp.setStatus(404);
         }
