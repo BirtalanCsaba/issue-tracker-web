@@ -1,8 +1,6 @@
 import java.util.*
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
     id("java")
     ear
 }
@@ -15,37 +13,22 @@ dependencies {
     implementation(project(":com.issue.tracker.infra.web"))
     implementation(project(":com.issue.tracker.infra.persistence"))
 
-//    deploy(project(":com.issue.tracker.domain"))
-//    deploy(project(":com.issue.tracker.api"))
-//    deploy(project(":com.issue.tracker.api.persistence"))
-//    deploy(project(":com.issue.tracker.infra"))
-//    deploy(project(":com.issue.tracker.infra.web"))
-//    deploy(project(":com.issue.tracker.infra.persistence"))
-
-    earlib(group = libs.jakarta.ee.get().group!!, name = libs.jakarta.ee.get().name, version = libs.jakarta.ee.get().version, ext = "jar")
-    earlib(group = libs.slf4j.log4j.get().group!!, name = libs.slf4j.log4j.get().name, version = libs.slf4j.log4j.get().version, ext = "jar")
-    earlib(group = libs.hibernate.jpamodelgen.get().group!!, name = libs.hibernate.jpamodelgen.get().name, version = libs.hibernate.jpamodelgen.get().version, ext = "jar")
-    earlib(group = libs.jetbrains.kotlinx.datetime.get().group!!, name = libs.jetbrains.kotlinx.datetime.get().name, version = libs.jetbrains.kotlinx.datetime.get().version, ext = "jar")
-    earlib(group = libs.fasterxml.jackson.databind.get().group!!, name = libs.fasterxml.jackson.databind.get().name, version = libs.fasterxml.jackson.databind.get().version, ext = "jar")
-    earlib(group = libs.spring.security.crypto.get().group!!, name = libs.spring.security.crypto.get().name, version = libs.spring.security.crypto.get().version, ext = "jar")
-}
-
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "17"
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+    deploy(project(":com.issue.tracker.domain"))
+    deploy(project(":com.issue.tracker.api"))
+    deploy(project(":com.issue.tracker.api.persistence"))
+    deploy(project(":com.issue.tracker.infra"))
+    deploy(project(":com.issue.tracker.infra.web")) {
+        targetConfiguration = "archives"
     }
-}
+    deploy(project(":com.issue.tracker.infra.persistence"))
 
-//tasks.withType<Ear> {
-//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//    from(configurations.compileClasspath.map { config -> config.map { if (it.isDirectory) it else zipTree(it) } })
-//}
+    earlib(group = libs.jakarta.ee.get().group, name = libs.jakarta.ee.get().name, version = libs.jakarta.ee.get().version, ext = "jar")
+    earlib(group = libs.slf4j.log4j.get().group, name = libs.slf4j.log4j.get().name, version = libs.slf4j.log4j.get().version, ext = "jar")
+    earlib(group = libs.hibernate.jpamodelgen.get().group, name = libs.hibernate.jpamodelgen.get().name, version = libs.hibernate.jpamodelgen.get().version, ext = "jar")
+    earlib(group = libs.jetbrains.kotlinx.datetime.get().group, name = libs.jetbrains.kotlinx.datetime.get().name, version = libs.jetbrains.kotlinx.datetime.get().version, ext = "jar")
+    earlib(group = libs.fasterxml.jackson.databind.get().group, name = libs.fasterxml.jackson.databind.get().name, version = libs.fasterxml.jackson.databind.get().version, ext = "jar")
+    earlib(group = libs.spring.security.crypto.get().group, name = libs.spring.security.crypto.get().name, version = libs.spring.security.crypto.get().version, ext = "jar")
+}
 
 val buildTask by tasks.named("build")
 
