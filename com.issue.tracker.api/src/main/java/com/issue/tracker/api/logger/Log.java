@@ -1,8 +1,9 @@
 package com.issue.tracker.api.logger;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public abstract class Log implements LogOperations {
+public abstract class Log implements LogOperations, Serializable {
     protected LogType logType;
     protected String message;
     protected Class<?> invokerClass;
@@ -17,15 +18,15 @@ public abstract class Log implements LogOperations {
         this.timestamp = LocalDateTime.now();
     }
 
-    protected void setLogType(LogType logType) {
+    public void setLogType(LogType logType) {
         this.logType = logType;
     }
 
-    protected void setMessage(String message) {
+    public void setMessage(String message) {
         this.message = message;
     }
 
-    protected void setInvokerClass(Class<?> invokerClass) {
+    public void setInvokerClass(Class<?> invokerClass) {
         this.invokerClass = invokerClass;
     }
 

@@ -3,12 +3,15 @@ package com.issue.tracker.infra.logger;
 import com.issue.tracker.api.logger.Log;
 import com.issue.tracker.api.logger.LogType;
 import com.issue.tracker.api.logger.LoggerBuilder;
-import jakarta.ejb.Singleton;
+import com.issue.tracker.api.logger.LoggerBuilderBase;
+import jakarta.ejb.Stateless;
 
-@Singleton
-public class LoggerBuilderImpl extends LoggerBuilder {
+import java.io.Serializable;
+
+@Stateless
+public class LoggerBuilderImpl extends LoggerBuilderBase implements LoggerBuilder, Serializable {
     @Override
-    public LoggerBuilder create(Class<?> invokerClass, LogType logType, String message) {
+    public LoggerBuilderBase create(Class<?> invokerClass, LogType logType, String message) {
         this.invokerClass = invokerClass;
         this.logType = logType;
         this.message = message;

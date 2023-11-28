@@ -1,6 +1,8 @@
 package com.issue.tracker.api.auth;
 
-public class LoginRequestModel {
+import java.io.Serializable;
+
+public class LoginRequestModel implements Serializable {
     private String username;
     private String password;
 

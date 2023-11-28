@@ -1,4 +1,4 @@
-package com.issue.tracker.infra.web.auth;
+package com.issue.tracker.infra.web.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;

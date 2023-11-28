@@ -1,17 +1,27 @@
 package com.issue.tracker.api.persistence.auth;
 
 
-public class SaveUserRequestModel {
+import java.io.Serializable;
+
+public class SaveUserRequestModel implements Serializable {
     private String firstName;
     private String lastName;
     private String username;
     private String password;
+    private String emailConfirmationToken;
+    private String email;
 
-    public SaveUserRequestModel(String firstName, String lastName, String username, String password) {
+    public SaveUserRequestModel() {
+
+    }
+
+    public SaveUserRequestModel(String firstName, String lastName, String username, String password, String emailConfirmationToken, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
+        this.emailConfirmationToken = emailConfirmationToken;
+        this.email = email;
     }
 
     public String getFirstName() {
@@ -44,5 +54,21 @@ public class SaveUserRequestModel {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmailConfirmationToken() {
+        return emailConfirmationToken;
+    }
+
+    public void setEmailConfirmationToken(String emailConfirmationToken) {
+        this.emailConfirmationToken = emailConfirmationToken;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -12,4 +12,5 @@ dependencies {
     compileOnly(libs.jakarta.ee)
     implementation(libs.fasterxml.jackson)
     implementation(libs.fasterxml.jackson.databind)
+    implementation(libs.eclipse.angus.email)
 }

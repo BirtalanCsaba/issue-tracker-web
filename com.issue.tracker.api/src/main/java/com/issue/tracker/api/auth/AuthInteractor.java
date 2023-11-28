@@ -7,11 +7,17 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
+import java.io.Serializable;
+import java.util.UUID;
+
 @Stateless
-public class AuthInteractor implements AuthInput {
+public class AuthInteractor implements AuthInput, Serializable {
 
     @EJB
     private AuthDsGateway authDsGateway;
+
+    @EJB
+    private AuthEmailSender authEmailSender;
 
     @Override
     public UserResponseModel register(RegisterRequestModel registerRequestModel) {
@@ -20,10 +26,12 @@ public class AuthInteractor implements AuthInput {
         }
 
         SaveUserRequestModel saveUserRequestModel = new SaveUserRequestModel(
+                registerRequestModel.getFirstName(),
+                registerRequestModel.getLastName(),
                 registerRequestModel.getUsername(),
                 registerRequestModel.getPassword(),
-                registerRequestModel.getFirstName(),
-                registerRequestModel.getLastName()
+                UUID.randomUUID().toString(),
+                registerRequestModel.getEmail()
         );
 
         UserDsResponseModel createdUser = authDsGateway.save(saveUserRequestModel);
@@ -32,18 +40,24 @@ public class AuthInteractor implements AuthInput {
             throw new UserCreationFailedException("User creation failed");
         }
 
+        // send confirmation email
+        authEmailSender.sendUserRegistrationEmailConfirmation(
+                createdUser.getEmail(),
+                createdUser.getEmailConfirmationToken()
+        );
+
         return new UserResponseModel(
                 createdUser.getId(),
-                createdUser.getUsername(),
-                createdUser.getPassword(),
                 createdUser.getFirstName(),
-                createdUser.getLastName()
+                createdUser.getLastName(),
+                createdUser.getUsername(),
+                createdUser.getEmail()
         );
     }
 
     @Override
     public boolean login(LoginRequestModel loginRequestModel) {
-        return authDsGateway.existsByUsernameAndPassword(
+        return authDsGateway.existsByUsernameAndPasswordAndIsActivated(
                 loginRequestModel.getUsername(),
                 loginRequestModel.getPassword()
         );

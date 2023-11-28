@@ -1,28 +1,14 @@
 package com.issue.tracker.api.logger;
 
-public abstract class LoggerBuilder {
-    protected Class<?> invokerClass;
-    protected LogType logType = LogType.INFO;
-    protected String message = "";
-    protected String stackTrace;
-    protected String reason;
+import jakarta.ejb.Remote;
 
-    protected LoggerBuilder create(Class<?> invokerClass, LogType logType, String message) {
-        this.invokerClass = invokerClass;
-        this.logType = logType;
-        this.message = message;
-        return this;
-    }
+@Remote
+public interface LoggerBuilder {
+    LoggerBuilder create(Class<?> invokerClass, LogType logType, String message);
 
-    protected LoggerBuilder withStackTrace(String stackTrace) {
-        this.stackTrace = stackTrace;
-        return this;
-    }
+    LoggerBuilder withStackTrace(String stackTrace);
 
-    protected LoggerBuilder withReason(String reason) {
-        this.reason = reason;
-        return this;
-    }
+    LoggerBuilder withReason(String reason);
 
-    protected abstract Log build();
+    Log build();
 }
