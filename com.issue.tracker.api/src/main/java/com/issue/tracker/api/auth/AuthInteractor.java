@@ -16,9 +16,6 @@ public class AuthInteractor implements AuthInput, Serializable {
     @EJB
     private AuthDsGateway authDsGateway;
 
-    @EJB
-    private AuthEmailSender authEmailSender;
-
     @Override
     public UserResponseModel register(RegisterRequestModel registerRequestModel) {
         if (authDsGateway.findByUsername(registerRequestModel.getUsername()) != null) {
@@ -39,12 +36,6 @@ public class AuthInteractor implements AuthInput, Serializable {
         if (createdUser == null) {
             throw new UserCreationFailedException("User creation failed");
         }
-
-        // send confirmation email
-        authEmailSender.sendUserRegistrationEmailConfirmation(
-                createdUser.getEmail(),
-                createdUser.getEmailConfirmationToken()
-        );
 
         return new UserResponseModel(
                 createdUser.getId(),
