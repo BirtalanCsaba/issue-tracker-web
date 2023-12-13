@@ -1,7 +1,14 @@
 package com.issue.tracker.infra.persistence.user;
 
 import com.issue.tracker.infra.persistence.common.BaseEntity;
+import com.issue.tracker.infra.persistence.kanban.IssueEntity;
+import com.issue.tracker.infra.persistence.kanban.KanbanEntity;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 public class UserEntity extends BaseEntity<Long> {
@@ -25,6 +32,16 @@ public class UserEntity extends BaseEntity<Long> {
 
     @Column
     private Boolean activated = false;
+
+    @ManyToMany
+    @JoinTable(
+            name = "users_issues",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "issue_id"))
+    private List<IssueEntity> issues;
+
+    @OneToMany(mappedBy = "kanban")
+    private Set<KanbanEntity> kanbans = new HashSet<>();
 
     public UserEntity() {
 
@@ -93,5 +110,21 @@ public class UserEntity extends BaseEntity<Long> {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<IssueEntity> getIssues() {
+        return issues;
+    }
+
+    public void setIssues(List<IssueEntity> issues) {
+        this.issues = issues;
+    }
+
+    public Set<KanbanEntity> getKanbans() {
+        return kanbans;
+    }
+
+    public void setKanbans(Set<KanbanEntity> kanbans) {
+        this.kanbans = kanbans;
     }
 }

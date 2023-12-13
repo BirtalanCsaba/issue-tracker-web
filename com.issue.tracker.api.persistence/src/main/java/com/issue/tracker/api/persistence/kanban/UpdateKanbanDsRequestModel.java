@@ -5,12 +5,15 @@ public class UpdateKanbanDsRequestModel {
 
     private String title;
 
+    private String description;
+
     public UpdateKanbanDsRequestModel() {
     }
 
-    public UpdateKanbanDsRequestModel(Long id, String title) {
+    public UpdateKanbanDsRequestModel(Long id, String title, String description) {
         this.id = id;
         this.title = title;
+        this.description = description;
     }
 
     public String getTitle() {
@@ -27,5 +30,13 @@ public class UpdateKanbanDsRequestModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

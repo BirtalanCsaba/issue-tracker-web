@@ -2,13 +2,19 @@ package com.issue.tracker.domain.kanban;
 
 import com.issue.tracker.domain.ValidationException;
 
+import java.util.List;
+
 public class BaseKanbanFactory implements KanbanFactory {
 
     @Override
-    public Kanban create(String title) {
+    public Kanban create(String title, String description, Long ownerId, List<Long> participants) {
         title = sanitizeString(title);
+        description = sanitizeString(description);
         validateRequiredString(title);
-        return new Kanban(title);
+        if (ownerId == null) {
+            throw new ValidationException("The owner is missing");
+        }
+        return new Kanban(title, description, ownerId, participants);
     }
 
     String sanitizeString(String value) {
