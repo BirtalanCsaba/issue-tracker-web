@@ -1,11 +1,9 @@
 package com.issue.tracker.infra.persistence.kanban;
 
 import com.issue.tracker.infra.persistence.common.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,8 +20,16 @@ public class KanbanEntity extends BaseEntity<Long> {
     @OneToMany(mappedBy = "kanban")
     private List<IssueEntity> issues;
 
-    @OneToMany(mappedBy = "user")
-    private Set<KanbanUserEntity> users = new HashSet<>();
+    @OneToMany(
+            mappedBy = "kanban",
+            cascade = {
+                    CascadeType.DETACH,
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST,
+                    CascadeType.REFRESH,
+            }
+    )
+    private List<KanbanUserEntity> users = new ArrayList<>();
 
     public KanbanEntity() {
     }
@@ -55,11 +61,11 @@ public class KanbanEntity extends BaseEntity<Long> {
         this.issues = issues;
     }
 
-    public Set<KanbanUserEntity> getUsers() {
+    public List<KanbanUserEntity> getUsers() {
         return users;
     }
 
-    public void setUsers(Set<KanbanUserEntity> users) {
+    public void setUsers(List<KanbanUserEntity> users) {
         this.users = users;
     }
 

@@ -3,6 +3,7 @@ package com.issue.tracker.infra.persistence.user;
 import com.issue.tracker.infra.persistence.common.BaseEntity;
 import com.issue.tracker.infra.persistence.kanban.IssueEntity;
 import com.issue.tracker.infra.persistence.kanban.KanbanEntity;
+import com.issue.tracker.infra.persistence.kanban.KanbanUserEntity;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -40,8 +41,16 @@ public class UserEntity extends BaseEntity<Long> {
             inverseJoinColumns = @JoinColumn(name = "issue_id"))
     private List<IssueEntity> issues;
 
-    @OneToMany(mappedBy = "kanban")
-    private Set<KanbanEntity> kanbans = new HashSet<>();
+    @OneToMany(
+            mappedBy = "user",
+            cascade = {
+                    CascadeType.DETACH,
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST,
+                    CascadeType.REFRESH,
+            }
+    )
+    private List<KanbanUserEntity> kanbans = new ArrayList<>();
 
     public UserEntity() {
 
@@ -120,11 +129,11 @@ public class UserEntity extends BaseEntity<Long> {
         this.issues = issues;
     }
 
-    public Set<KanbanEntity> getKanbans() {
+    public List<KanbanUserEntity> getKanbans() {
         return kanbans;
     }
 
-    public void setKanbans(Set<KanbanEntity> kanbans) {
+    public void setKanbans(List<KanbanUserEntity> kanbans) {
         this.kanbans = kanbans;
     }
 }

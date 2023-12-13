@@ -12,13 +12,13 @@ public class KanbanUserEntity implements Serializable {
     @EmbeddedId
     private KanbanUserPK id;
 
-    @ManyToOne
-    @MapsId("kanban_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("kanbanId")
     @JoinColumn(name = "kanban_id")
     private KanbanEntity kanban;
 
-    @ManyToOne
-    @MapsId("user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
