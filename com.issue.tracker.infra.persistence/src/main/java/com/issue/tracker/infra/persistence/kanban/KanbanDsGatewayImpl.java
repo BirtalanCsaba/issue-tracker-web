@@ -1,11 +1,11 @@
 package com.issue.tracker.infra.persistence.kanban;
 
-import com.issue.tracker.api.persistence.kanban.CreateKanbanDsRequestModel;
-import com.issue.tracker.api.persistence.kanban.KanbanDsGateway;
-import com.issue.tracker.api.persistence.kanban.KanbanDsResponseModel;
-import com.issue.tracker.api.persistence.kanban.UpdateKanbanDsRequestModel;
+import com.issue.tracker.api.persistence.auth.AuthDsGateway;
+import com.issue.tracker.api.persistence.kanban.*;
 import com.issue.tracker.infra.persistence.user.UserEntity;
 import com.issue.tracker.infra.persistence.user.UserEntity_;
+import com.issue.tracker.infra.persistence.user.UserRepository;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -13,61 +13,65 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Stateless
 public class KanbanDsGatewayImpl implements KanbanDsGateway {
     @PersistenceContext(unitName = "jpa")
     private EntityManager em;
 
+    @EJB
+    private KanbanRepository kanbanRepository;
+
+    @EJB
+    private UserRepository userRepository;
+
     @Override
     public KanbanDsResponseModel create(CreateKanbanDsRequestModel kanban) {
-        EntityTransaction transaction = em.getTransaction();
-        try {
-            transaction.begin();
+        KanbanEntity kanbanEntity = kanbanRepository.save(
+                new KanbanEntity(
+                        kanban.getTitle(),
+                        kanban.getDescription()
+                )
+        );
+        UserEntity owner = userRepository.findById(kanban.getOwnerId());
+        List<UserEntity> users = userRepository.findAllUsersWithIds(kanban.getParticipants());
 
-            KanbanEntity kanbanEntity = new KanbanEntity(kanban.getTitle(), kanban.getDescription());
-            em.persist(kanbanEntity);
-            em.flush();
+        Set<KanbanUserEntity> kanbanUsers = getKanbanUserEntities(owner, users, kanbanEntity);
 
-            Set<KanbanUserEntity> kanbanUsers = getKanbanUserEntities(kanban, kanbanEntity);
-
-            for (var participant : kanbanUsers) {
-                em.persist(participant);
-            }
-            em.flush();
-
-            transaction.commit();
-
-            return new KanbanDsResponseModel(
-                    kanbanEntity.getId(),
-                    kanbanEntity.getTitle(),
-                    kanbanEntity.getDescription(),
-                    kanbanEntity.getOwnerIds(),
-                    kanban.getParticipants()
-            );
-        } catch (RuntimeException ex) {
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-            throw ex;
+        if (kanbanUsers.size() != kanban.getParticipants().size() + 1) { // + 1 for the owner
+            throw new SomeUsersNotFoundException("Some users where not found");
         }
+
+        for (var participant : kanbanUsers) {
+            em.persist(participant);
+        }
+        em.flush();
+
+        return new KanbanDsResponseModel(
+                kanbanEntity.getId(),
+                kanbanEntity.getTitle(),
+                kanbanEntity.getDescription(),
+                Collections.singletonList(owner.getId()),
+                kanban.getParticipants()
+        );
     }
 
-    @NotNull
-    private static Set<KanbanUserEntity> getKanbanUserEntities(CreateKanbanDsRequestModel kanban, KanbanEntity kanbanEntity) {
+    private Set<KanbanUserEntity> getKanbanUserEntities(UserEntity owner, List<UserEntity> participants, KanbanEntity kanban) {
         Set<KanbanUserEntity> kanbanUsers = new HashSet<>();
-        KanbanUserEntity owner = new KanbanUserEntity(
-                new KanbanUserPK(kanban.getOwnerId(), kanbanEntity.getId())
-        );
-        kanbanUsers.add(owner);
-        for (var participant : kanban.getParticipants()) {
-            KanbanUserEntity currentKanbanParticipantEntity = new KanbanUserEntity(
-                    new KanbanUserPK(participant, kanbanEntity.getId())
-            );
-            kanbanUsers.add(currentKanbanParticipantEntity);
+        KanbanUserEntity ownerKanbanAssociation = new KanbanUserEntity();
+        ownerKanbanAssociation.setUser(owner);
+        ownerKanbanAssociation.setKanban(kanban);
+        ownerKanbanAssociation.setRole(KanbanUserRole.OWNER);
+        ownerKanbanAssociation.setId(new KanbanUserPK(owner.getId(), kanban.getId()));
+        kanbanUsers.add(ownerKanbanAssociation);
+        for (var participant : participants) {
+            KanbanUserEntity currentKanbanParticipantEntityAssociation = new KanbanUserEntity();
+            currentKanbanParticipantEntityAssociation.setUser(participant);
+            currentKanbanParticipantEntityAssociation.setKanban(kanban);
+            currentKanbanParticipantEntityAssociation.setRole(KanbanUserRole.PARTICIPANT);
+            currentKanbanParticipantEntityAssociation.setId(new KanbanUserPK(participant.getId(), kanban.getId()));
+            kanbanUsers.add(currentKanbanParticipantEntityAssociation);
         }
         return kanbanUsers;
     }

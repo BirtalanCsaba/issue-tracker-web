@@ -4,7 +4,9 @@ import com.issue.tracker.api.ApiException;
 import com.issue.tracker.api.persistence.kanban.CreateKanbanDsRequestModel;
 import com.issue.tracker.api.persistence.kanban.KanbanDsGateway;
 import com.issue.tracker.api.persistence.kanban.KanbanDsResponseModel;
+import com.issue.tracker.domain.kanban.BaseKanbanFactory;
 import com.issue.tracker.domain.kanban.Kanban;
+import com.issue.tracker.domain.kanban.KanbanFactory;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 
@@ -15,9 +17,11 @@ public class KanbanInteractor implements KanbanManagerInput {
     @EJB
     private KanbanDsGateway kanbanDsGateway;
 
+    private final KanbanFactory kanbanFactory = new BaseKanbanFactory();
+
     @Override
     public KanbanResponseModel create(CreateKanbanRequestModel kanban) {
-        Kanban newKanban = new Kanban(
+        Kanban newKanban = kanbanFactory.create(
                 kanban.getTitle(),
                 kanban.getDescription(),
                 kanban.getOwnerId(),

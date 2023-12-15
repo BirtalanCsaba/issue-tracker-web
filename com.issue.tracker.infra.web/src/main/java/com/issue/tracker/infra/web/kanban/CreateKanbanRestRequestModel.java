@@ -1,35 +1,21 @@
-package com.issue.tracker.api.kanban;
+package com.issue.tracker.infra.web.kanban;
 
 import java.util.List;
 
-public class KanbanResponseModel {
-    private Long id;
-
+public class CreateKanbanRestRequestModel {
     private String title;
 
     private String description;
 
-    private List<Long> owners;
-
     private List<Long> participants;
 
-    public KanbanResponseModel() {
+    public CreateKanbanRestRequestModel() {
     }
 
-    public KanbanResponseModel(Long id, String title, String description, List<Long> owners, List<Long> participants) {
-        this.id = id;
+    public CreateKanbanRestRequestModel(String title, String description, List<Long> participants) {
         this.title = title;
         this.description = description;
-        this.owners = owners;
         this.participants = participants;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -46,14 +32,6 @@ public class KanbanResponseModel {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<Long> getOwners() {
-        return owners;
-    }
-
-    public void setOwners(List<Long> owners) {
-        this.owners = owners;
     }
 
     public List<Long> getParticipants() {

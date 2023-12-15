@@ -50,4 +50,16 @@ public class AuthInteractor implements AuthInput, Serializable {
                 loginRequestModel.getPassword()
         );
     }
+
+    @Override
+    public UserResponseModel findByUsername(String username) {
+        UserDsResponseModel theUser = authDsGateway.findByUsername(username);
+        return new UserResponseModel(
+                theUser.getId(),
+                theUser.getFirstName(),
+                theUser.getLastName(),
+                theUser.getUsername(),
+                theUser.getEmail()
+        );
+    }
 }

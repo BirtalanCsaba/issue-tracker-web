@@ -3,7 +3,6 @@ package com.issue.tracker.infra.web.auth;
 import com.issue.tracker.api.auth.AuthInput;
 import com.issue.tracker.api.auth.LoginRequestModel;
 import com.issue.tracker.api.auth.RegisterRequestModel;
-import com.issue.tracker.api.auth.UserResponseModel;
 import com.issue.tracker.api.logger.LogType;
 import com.issue.tracker.api.logger.LoggerBuilder;
 import com.issue.tracker.infra.security.JWTKeys;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Path("/auth")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationRestController {
     @EJB
     private AuthInput authInteractor;
@@ -31,8 +32,6 @@ public class AuthenticationRestController {
 
     @POST
     @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response login(LoginRequestModel loginRequestModel) {
         try {
             boolean authenticated = authInteractor.login(loginRequestModel);
@@ -56,8 +55,6 @@ public class AuthenticationRestController {
 
     @POST
     @Path("/register")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response register(RegisterRequestModel registrationData) {
         try {
             return Response.ok(authInteractor.register(registrationData)).build();

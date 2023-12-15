@@ -7,4 +7,6 @@ public interface AuthInput {
     UserResponseModel register(RegisterRequestModel registerRequestModel);
 
     boolean login(LoginRequestModel loginRequestModel);
+
+    UserResponseModel findByUsername(String username);
 }
