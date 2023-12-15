@@ -28,18 +28,21 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
 
     @Override
     public KanbanDsResponseModel create(CreateKanbanDsRequestModel kanban) {
+        UserEntity owner = userRepository.findById(kanban.getOwnerId());
         KanbanEntity kanbanEntity = kanbanRepository.save(
                 new KanbanEntity(
                         kanban.getTitle(),
-                        kanban.getDescription()
+                        kanban.getDescription(),
+                        owner
                 )
         );
-        UserEntity owner = userRepository.findById(kanban.getOwnerId());
-        List<UserEntity> users = userRepository.findAllUsersWithIds(kanban.getParticipants());
 
-        Set<KanbanUserEntity> kanbanUsers = getKanbanUserEntities(owner, users, kanbanEntity);
+        List<UserEntity> participantUsers = userRepository.findAllUsersWithIds(kanban.getParticipants());
+        List<UserEntity> adminUsers = userRepository.findAllUsersWithIds(kanban.getAdmins());
 
-        if (kanbanUsers.size() != kanban.getParticipants().size() + 1) { // + 1 for the owner
+        Set<KanbanUserEntity> kanbanUsers = getKanbanUserEntities(participantUsers, adminUsers, kanbanEntity);
+
+        if (kanbanUsers.size() != kanban.getParticipants().size() + kanban.getAdmins().size()) { // + 1 for the owner
             throw new SomeUsersNotFoundException("Some users where not found");
         }
 
@@ -52,25 +55,28 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 kanbanEntity.getId(),
                 kanbanEntity.getTitle(),
                 kanbanEntity.getDescription(),
-                Collections.singletonList(owner.getId()),
+                owner.getId(),
+                kanban.getAdmins(),
                 kanban.getParticipants()
         );
     }
 
-    private Set<KanbanUserEntity> getKanbanUserEntities(UserEntity owner, List<UserEntity> participants, KanbanEntity kanban) {
+    private Set<KanbanUserEntity> getKanbanUserEntities(List<UserEntity> participants, List<UserEntity> admins, KanbanEntity kanban) {
         Set<KanbanUserEntity> kanbanUsers = new HashSet<>();
-        KanbanUserEntity ownerKanbanAssociation = new KanbanUserEntity();
-        ownerKanbanAssociation.setUser(owner);
-        ownerKanbanAssociation.setKanban(kanban);
-        ownerKanbanAssociation.setRole(KanbanUserRole.OWNER);
-        ownerKanbanAssociation.setId(new KanbanUserPK(owner.getId(), kanban.getId()));
-        kanbanUsers.add(ownerKanbanAssociation);
         for (var participant : participants) {
             KanbanUserEntity currentKanbanParticipantEntityAssociation = new KanbanUserEntity();
             currentKanbanParticipantEntityAssociation.setUser(participant);
             currentKanbanParticipantEntityAssociation.setKanban(kanban);
             currentKanbanParticipantEntityAssociation.setRole(KanbanUserRole.PARTICIPANT);
             currentKanbanParticipantEntityAssociation.setId(new KanbanUserPK(participant.getId(), kanban.getId()));
+            kanbanUsers.add(currentKanbanParticipantEntityAssociation);
+        }
+        for (var admin : admins) {
+            KanbanUserEntity currentKanbanParticipantEntityAssociation = new KanbanUserEntity();
+            currentKanbanParticipantEntityAssociation.setUser(admin);
+            currentKanbanParticipantEntityAssociation.setKanban(kanban);
+            currentKanbanParticipantEntityAssociation.setRole(KanbanUserRole.ADMIN);
+            currentKanbanParticipantEntityAssociation.setId(new KanbanUserPK(admin.getId(), kanban.getId()));
             kanbanUsers.add(currentKanbanParticipantEntityAssociation);
         }
         return kanbanUsers;
@@ -88,7 +94,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 result.getId(),
                 result.getTitle(),
                 result.getDescription(),
-                result.getOwnerIds(),
+                result.getOwner().getId(),
+                result.getAdminIds(),
                 result.getParticipantsIds()
         );
     }
@@ -105,7 +112,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 result.getId(),
                 result.getTitle(),
                 result.getDescription(),
-                result.getOwnerIds(),
+                result.getOwner().getId(),
+                result.getAdminIds(),
                 result.getParticipantsIds()
         );
     }
@@ -140,7 +148,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 k.getId(),
                 k.getTitle(),
                 k.getDescription(),
-                k.getOwnerIds(),
+                k.getOwner().getId(),
+                k.getAdminIds(),
                 k.getParticipantsIds()
         )).toList();
     }

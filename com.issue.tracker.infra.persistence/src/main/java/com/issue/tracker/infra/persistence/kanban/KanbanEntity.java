@@ -32,24 +32,36 @@ public class KanbanEntity extends BaseEntity<Long> {
     )
     private List<KanbanUserEntity> users = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private UserEntity owner;
+
     public KanbanEntity() {
     }
 
-    public KanbanEntity(String title, String description) {
+    public KanbanEntity(String title, String description, UserEntity owner) {
         this.title = title;
         this.description = description;
+        this.owner = owner;
     }
 
-    public List<UserEntity> getOwners() {
+    public KanbanEntity(Long aLong, String title, String description, UserEntity owner) {
+        super(aLong);
+        this.title = title;
+        this.description = description;
+        this.owner = owner;
+    }
+
+    public List<UserEntity> getAdmins() {
         return users.stream()
-                .filter(u -> u.getRole() == KanbanUserRole.OWNER)
+                .filter(u -> u.getRole() == KanbanUserRole.ADMIN)
                 .map(KanbanUserEntity::getUser)
                 .toList();
     }
 
-    public List<Long> getOwnerIds() {
+    public List<Long> getAdminIds() {
         return users.stream()
-                .filter(u -> u.getRole() == KanbanUserRole.OWNER)
+                .filter(u -> u.getRole() == KanbanUserRole.ADMIN)
                 .map(u -> u.getUser().getId())
                 .toList();
     }
@@ -66,12 +78,6 @@ public class KanbanEntity extends BaseEntity<Long> {
                 .filter(u -> u.getRole() == KanbanUserRole.PARTICIPANT)
                 .map(u -> u.getUser().getId())
                 .toList();
-    }
-
-    public KanbanEntity(Long aLong, String title, String description) {
-        super(aLong);
-        this.title = title;
-        this.description = description;
     }
 
     public String getTitle() {
@@ -104,5 +110,13 @@ public class KanbanEntity extends BaseEntity<Long> {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public UserEntity getOwner() {
+        return owner;
+    }
+
+    public void setOwner(UserEntity owner) {
+        this.owner = owner;
     }
 }

@@ -9,12 +9,15 @@ public class Kanban {
 
     private Long owner;
 
+    private List<Long> admins;
+
     private List<Long> participants;
 
-    public Kanban(String title, String description, Long owner, List<Long> participants) {
+    public Kanban(String title, String description, Long owner, List<Long> admins, List<Long> participants) {
         this.title = title;
         this.description = description;
         this.owner = owner;
+        this.admins = admins;
         this.participants = participants;
     }
 
@@ -40,6 +43,14 @@ public class Kanban {
 
     public void setOwner(Long owner) {
         this.owner = owner;
+    }
+
+    public List<Long> getAdmins() {
+        return admins;
+    }
+
+    public void setAdmins(List<Long> admins) {
+        this.admins = admins;
     }
 
     public List<Long> getParticipants() {

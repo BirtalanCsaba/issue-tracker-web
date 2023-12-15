@@ -7,14 +7,17 @@ public class CreateKanbanRestRequestModel {
 
     private String description;
 
+    private List<Long> admins;
+
     private List<Long> participants;
 
     public CreateKanbanRestRequestModel() {
     }
 
-    public CreateKanbanRestRequestModel(String title, String description, List<Long> participants) {
+    public CreateKanbanRestRequestModel(String title, String description, List<Long> admins, List<Long> participants) {
         this.title = title;
         this.description = description;
+        this.admins = admins;
         this.participants = participants;
     }
 
@@ -32,6 +35,15 @@ public class CreateKanbanRestRequestModel {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    public List<Long> getAdmins() {
+        return admins;
+    }
+
+    public void setAdmins(List<Long> admins) {
+        this.admins = admins;
     }
 
     public List<Long> getParticipants() {

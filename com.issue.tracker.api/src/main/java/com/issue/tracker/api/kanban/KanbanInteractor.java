@@ -25,19 +25,21 @@ public class KanbanInteractor implements KanbanManagerInput {
                 kanban.getTitle(),
                 kanban.getDescription(),
                 kanban.getOwnerId(),
+                kanban.getAdmins(),
                 kanban.getParticipants()
         );
         KanbanDsResponseModel response = kanbanDsGateway.create(new CreateKanbanDsRequestModel(
                 newKanban.getTitle(),
                 newKanban.getDescription(),
                 newKanban.getOwner(),
+                kanban.getAdmins(),
                 newKanban.getParticipants()
         ));
         return new KanbanResponseModel(
                 response.getId(),
                 response.getTitle(),
                 response.getDescription(),
-                response.getOwners(),
+                response.getAdmins(),
                 response.getParticipants()
         );
     }
@@ -50,7 +52,7 @@ public class KanbanInteractor implements KanbanManagerInput {
                         k.getId(),
                         k.getTitle(),
                         k.getDescription(),
-                        k.getOwners(),
+                        k.getAdmins(),
                         k.getParticipants()
                 )).toList();
     }

@@ -10,16 +10,19 @@ public class CreateKanbanDsRequestModel implements Serializable {
 
     private Long ownerId;
 
+    private List<Long> admins;
+
     private List<Long> participants;
 
     public CreateKanbanDsRequestModel() {
 
     }
 
-    public CreateKanbanDsRequestModel(String title, String description, Long ownerId, List<Long> participants) {
+    public CreateKanbanDsRequestModel(String title, String description, Long ownerId, List<Long> admins, List<Long> participants) {
         this.title = title;
         this.description = description;
         this.ownerId = ownerId;
+        this.admins = admins;
         this.participants = participants;
     }
 
@@ -45,6 +48,14 @@ public class CreateKanbanDsRequestModel implements Serializable {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public List<Long> getAdmins() {
+        return admins;
+    }
+
+    public void setAdmins(List<Long> admins) {
+        this.admins = admins;
     }
 
     public List<Long> getParticipants() {

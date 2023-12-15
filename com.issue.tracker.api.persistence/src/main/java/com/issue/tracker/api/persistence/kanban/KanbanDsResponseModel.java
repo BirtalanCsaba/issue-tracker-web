@@ -10,18 +10,20 @@ public class KanbanDsResponseModel implements Serializable {
 
     private String description;
 
-    private List<Long> owners;
+    private Long ownerId;
+
+    private List<Long> admins;
 
     private List<Long> participants;
 
     public KanbanDsResponseModel() {
     }
 
-    public KanbanDsResponseModel(Long id, String title, String description, List<Long> owners, List<Long> participants) {
+    public KanbanDsResponseModel(Long id, String title, String description, Long ownerId, List<Long> admins, List<Long> participants) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.owners = owners;
+        this.admins = admins;
         this.participants = participants;
     }
 
@@ -49,12 +51,12 @@ public class KanbanDsResponseModel implements Serializable {
         this.description = description;
     }
 
-    public List<Long> getOwners() {
-        return owners;
+    public List<Long> getAdmins() {
+        return admins;
     }
 
-    public void setOwners(List<Long> owners) {
-        this.owners = owners;
+    public void setAdmins(List<Long> admins) {
+        this.admins = admins;
     }
 
     public List<Long> getParticipants() {
@@ -63,5 +65,13 @@ public class KanbanDsResponseModel implements Serializable {
 
     public void setParticipants(List<Long> participants) {
         this.participants = participants;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 }

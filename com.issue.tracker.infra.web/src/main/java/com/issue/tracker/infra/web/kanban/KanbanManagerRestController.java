@@ -41,6 +41,7 @@ public class KanbanManagerRestController {
                             kanban.getTitle(),
                             kanban.getDescription(),
                             currentAuthenticatedUser.getId(),
+                            kanban.getAdmins(),
                             kanban.getParticipants()
                     )
             )).build();
