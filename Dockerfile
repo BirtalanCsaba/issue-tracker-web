@@ -7,20 +7,11 @@ RUN apt-get update && \
 
 WORKDIR /bitnami/wildfly
 
-# setup postgres JDBC driver for WildFly
 RUN sudo apt-get install -y wget && \
     mkdir /opt/bitnami/wildfly/modules/system/layers/base/com/postgres && \
     mkdir /opt/bitnami/wildfly/modules/system/layers/base/com/postgres/main && \
     sudo wget -P /opt/bitnami/wildfly/modules/system/layers/base/com/postgres/main \
     https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.0/postgresql-42.7.0.jar
-
-COPY ./wildfly-conf/module.xml /opt/bitnami/wildfly/modules/system/layers/base/com/postgres/main/module.xml
-COPY ./wildfly-conf/standalone.xml /opt/bitnami/wildfly/standalone/configuration/standalone.xml
-
-FROM base as build
-
-ENV APP_HOME=/usr/app/
-WORKDIR $APP_HOME
 
 # Download gradle
 RUN sudo apt-get install unzip
@@ -30,7 +21,14 @@ RUN unzip /usr/gradle/gradle-8.3-bin.zip -d /usr/gradle
 ENV GRADLE_HOME=/usr/gradle/gradle-8.3
 ENV PATH=$PATH:$GRADLE_HOME/bin
 
-# build the project
+COPY ./wildfly-conf/module.xml /opt/bitnami/wildfly/modules/system/layers/base/com/postgres/main/module.xml
+COPY ./wildfly-conf/standalone.xml /opt/bitnami/wildfly/standalone/configuration/standalone.xml
+
+FROM base as build
+
+ENV APP_HOME=/usr/app/
+WORKDIR $APP_HOME
+
 COPY ./build.gradle.kts ./settings.gradle.kts $APP_HOME
 COPY ./com.issue.tracker.domain/build.gradle.kts $APP_HOME/com.issue.tracker.domain/build.gradle.kts
 COPY ./com.issue.tracker.api/build.gradle.kts $APP_HOME/com.issue.tracker.api/build.gradle.kts
@@ -53,12 +51,8 @@ COPY ./gradle/libs.versions.toml $APP_HOME/gradle/libs.versions.toml
 COPY ./build.properties $APP_HOME/build.properties
 COPY ./src $APP_HOME/src
 
-RUN gradle clean build
+RUN gradle build
 
-FROM base as deploy
-
-# perform the deployment process
-
-COPY --from=build /usr/app/build/libs/issue-tracker.ear /opt/bitnami/wildfly/standalone/deployments/issue-tracker.ear
+RUN cp ./build/libs/issue-tracker.ear /opt/bitnami/wildfly/standalone/deployments/issue-tracker.ear
 
 CMD [ "/opt/bitnami/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0", "-bconsole", "0.0.0.0" ]

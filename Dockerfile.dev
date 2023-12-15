@@ -18,6 +18,8 @@ COPY ./wildfly-conf/standalone.xml /opt/bitnami/wildfly/standalone/configuration
 # for dev, allow debugging
 COPY ./wildfly-conf/standalone.sh /opt/bitnami/wildfly/bin/standalone.sh
 
+RUN /opt/bitnami/wildfly/bin/add-user.sh -u 'admin' -p 'admin'
+
 FROM base as build
 
 ENV APP_HOME=/usr/app/
@@ -57,4 +59,4 @@ RUN gradle build
 
 RUN cp ./build/libs/issue-tracker.ear /opt/bitnami/wildfly/standalone/deployments/issue-tracker.ear
 
-CMD [ "/opt/bitnami/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0", "-bconsole", "0.0.0.0" ]
+CMD [ "/opt/bitnami/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0", "-bconsole", "0.0.0.0", "--debug", "*:8787" ]

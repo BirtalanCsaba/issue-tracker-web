@@ -18,28 +18,15 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
 
     @Override
     public boolean existsByUsernameAndPassword(String username, String password) {
-        String encryptedPassword = BCryptManager.encrypt(password);
-
-        String queryString = "select count(u) > 0 from UserEntity u where username=:username and password=:password";
+        String queryString = "select u from UserEntity u where username=:username";
 
         Query query = entityManager.createQuery(queryString);
         query.setParameter("username", username);
-        query.setParameter("password", encryptedPassword);
-
-        return (Boolean) query.getSingleResult();
-    }
-
-    @Override
-    public Boolean existsByUsernameAndPasswordAndIsActivated(String username, String password) {
-        String encryptedPassword = BCryptManager.encrypt(password);
-
-        String queryString = "select count(u) > 0 from UserEntity u where username=:username and password=:password and activated=true";
-
-        Query query = entityManager.createQuery(queryString);
-        query.setParameter("username", username);
-        query.setParameter("password", encryptedPassword);
-
-        return (Boolean) query.getSingleResult();
+        UserEntity user = (UserEntity) query.getSingleResult();
+        if (user == null) {
+            return false;
+        }
+        return BCryptManager.matches(password, user.getPassword());
     }
 
     @Override
@@ -57,7 +44,6 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                     result.getLastName(),
                     result.getUsername(),
                     result.getPassword(),
-                    result.getEmailConfirmationToken(),
                     result.getEmail()
             );
         } catch (NoResultException ex) {
@@ -74,7 +60,6 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                         encryptedPassword,
                         saveUserRequestModel.getFirstName(),
                         saveUserRequestModel.getLastName(),
-                        saveUserRequestModel.getEmailConfirmationToken(),
                         saveUserRequestModel.getEmail()
                 )
         );
@@ -94,7 +79,6 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                 result.getLastName(),
                 result.getUsername(),
                 result.getPassword(),
-                result.getEmailConfirmationToken(),
                 result.getEmail()
         ) : null;
     }
@@ -114,7 +98,6 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                     result.getLastName(),
                     result.getUsername(),
                     result.getPassword(),
-                    result.getEmailConfirmationToken(),
                     result.getEmail()
             );
         } catch (NoResultException ex) {

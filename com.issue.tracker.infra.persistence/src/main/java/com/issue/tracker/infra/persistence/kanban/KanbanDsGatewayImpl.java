@@ -4,13 +4,17 @@ import com.issue.tracker.api.persistence.kanban.CreateKanbanDsRequestModel;
 import com.issue.tracker.api.persistence.kanban.KanbanDsGateway;
 import com.issue.tracker.api.persistence.kanban.KanbanDsResponseModel;
 import com.issue.tracker.api.persistence.kanban.UpdateKanbanDsRequestModel;
+import com.issue.tracker.infra.persistence.user.UserEntity;
+import com.issue.tracker.infra.persistence.user.UserEntity_;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Stateless
@@ -41,7 +45,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                     kanbanEntity.getId(),
                     kanbanEntity.getTitle(),
                     kanbanEntity.getDescription(),
-                    kanban.getOwnerId(),
+                    kanbanEntity.getOwnerIds(),
                     kanban.getParticipants()
             );
         } catch (RuntimeException ex) {
@@ -70,12 +74,36 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
 
     @Override
     public KanbanDsResponseModel findById(Long id) {
-        return null;
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<KanbanEntity> criteriaQuery = criteriaBuilder.createQuery(KanbanEntity.class);
+        Root<KanbanEntity> root = criteriaQuery.from(KanbanEntity.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(KanbanEntity_.ID), id));
+        KanbanEntity result = em.createQuery(criteriaQuery).getSingleResult();
+
+        return new KanbanDsResponseModel(
+                result.getId(),
+                result.getTitle(),
+                result.getDescription(),
+                result.getOwnerIds(),
+                result.getParticipantsIds()
+        );
     }
 
     @Override
     public KanbanDsResponseModel findByTitle(String title) {
-        return null;
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<KanbanEntity> criteriaQuery = criteriaBuilder.createQuery(KanbanEntity.class);
+        Root<KanbanEntity> root = criteriaQuery.from(KanbanEntity.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(KanbanEntity_.TITLE), title));
+        KanbanEntity result = em.createQuery(criteriaQuery).getSingleResult();
+
+        return new KanbanDsResponseModel(
+                result.getId(),
+                result.getTitle(),
+                result.getDescription(),
+                result.getOwnerIds(),
+                result.getParticipantsIds()
+        );
     }
 
     @Override
@@ -84,7 +112,47 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
-    public void removeById(Long id) {
+    public List<KanbanDsResponseModel> findAllByUserId(Long userId) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<KanbanEntity> criteriaQuery = criteriaBuilder.createQuery(KanbanEntity.class);
+        Root<KanbanEntity> parentRoot = criteriaQuery.from(KanbanEntity.class);
 
+        // KanbanUserEntity join
+        Join<KanbanEntity, KanbanUserEntity> kanbanUserJoin = parentRoot.join(KanbanEntity_.USERS);
+
+        // UserEntity join
+        Join<KanbanEntity, KanbanUserEntity> userJoin = kanbanUserJoin.join(KanbanUserEntity_.USER);
+
+        // Add a predicate to filter by childProperty
+        criteriaQuery.where(criteriaBuilder.equal(userJoin.get(UserEntity_.ID), userId));
+
+        // Remove duplicates caused by the join
+        criteriaQuery.distinct(true);
+
+        // Execute the query and retrieve the result
+        List<KanbanEntity> result = em.createQuery(criteriaQuery).getResultList();
+
+        return result.stream().map(k -> new KanbanDsResponseModel(
+                k.getId(),
+                k.getTitle(),
+                k.getDescription(),
+                k.getOwnerIds(),
+                k.getParticipantsIds()
+        )).toList();
+    }
+
+    @Override
+    public void removeById(Long id) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaDelete<UserEntity> delete = criteriaBuilder.createCriteriaDelete(UserEntity.class);
+        Root<UserEntity> root = delete.from(UserEntity.class);
+
+        // Add a predicate to the delete query to filter by ID
+        delete.where(criteriaBuilder.equal(root.get(UserEntity_.ID), id));
+
+        // Execute the delete query
+        em.createQuery(delete).executeUpdate();
+
+        em.getTransaction().commit();
     }
 }

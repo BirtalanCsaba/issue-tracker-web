@@ -4,6 +4,7 @@ import com.issue.tracker.infra.persistence.user.UserEntity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity

@@ -9,18 +9,18 @@ public class KanbanResponseModel {
 
     private String description;
 
-    private Long ownerId;
+    private List<Long> owners;
 
     private List<Long> participants;
 
     public KanbanResponseModel() {
     }
 
-    public KanbanResponseModel(Long id, String title, String description, Long ownerId, List<Long> participants) {
+    public KanbanResponseModel(Long id, String title, String description, List<Long> owners, List<Long> participants) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.ownerId = ownerId;
+        this.owners = owners;
         this.participants = participants;
     }
 
@@ -48,12 +48,12 @@ public class KanbanResponseModel {
         this.description = description;
     }
 
-    public Long getOwnerId() {
-        return ownerId;
+    public List<Long> getOwnerId() {
+        return owners;
     }
 
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
+    public void setOwnerId(List<Long> owners) {
+        this.owners = owners;
     }
 
     public List<Long> getParticipants() {

@@ -1,7 +1,6 @@
 package com.issue.tracker.api.kanban;
 
 import jakarta.ejb.Local;
-import jakarta.ejb.Remote;
 
 import java.util.List;
 
@@ -9,5 +8,7 @@ import java.util.List;
 public interface KanbanManagerInput {
     KanbanResponseModel create(CreateKanbanRequestModel kanban);
 
-    List<KanbanResponseModel> findAllEnrolledKanbanForUser(Long userId);
+    List<KanbanResponseModel> findAllEnrolledKanbansForUser(Long userId);
+
+    void removeKanbanById(Long kanbanId);
 }

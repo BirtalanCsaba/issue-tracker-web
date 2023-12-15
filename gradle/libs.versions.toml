@@ -5,6 +5,7 @@ jakarta = "10.0.0"
 hibernateJpaModelgen = "6.3.1.Final"
 jetbrainsKotlinx = "0.4.0"
 jackson = "2.16.0"
+auth0Jwt = "4.4.0"
 
 [libraries]
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -15,7 +16,7 @@ jetbrains-kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 fasterxml-jackson = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
 fasterxml-jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
 spring-security-crypto = { group = "org.springframework.security", name = "spring-security-crypto", version = "6.2.0" }
-eclipse-angus-email = { group = "org.eclipse.angus", name = "angus-mail", version = "2.0.2" }
+auth0-jwt = { group = "com.auth0", name = "java-jwt", version.ref = "auth0Jwt" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

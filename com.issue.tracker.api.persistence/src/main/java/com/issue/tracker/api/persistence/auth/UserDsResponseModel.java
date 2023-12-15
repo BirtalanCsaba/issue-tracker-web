@@ -8,20 +8,18 @@ public class UserDsResponseModel implements Serializable {
     private String lastName;
     private String username;
     private String password;
-    private String emailConfirmationToken;
     private String email;
 
     public UserDsResponseModel() {
 
     }
 
-    public UserDsResponseModel(Long id, String firstName, String lastName, String username, String password, String emailConfirmationToken, String email) {
+    public UserDsResponseModel(Long id, String firstName, String lastName, String username, String password, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
-        this.emailConfirmationToken = emailConfirmationToken;
         this.email = email;
     }
 
@@ -63,14 +61,6 @@ public class UserDsResponseModel implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getEmailConfirmationToken() {
-        return emailConfirmationToken;
-    }
-
-    public void setEmailConfirmationToken(String emailConfirmationToken) {
-        this.emailConfirmationToken = emailConfirmationToken;
     }
 
     public String getEmail() {

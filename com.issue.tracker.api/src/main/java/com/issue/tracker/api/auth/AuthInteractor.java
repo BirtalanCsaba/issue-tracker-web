@@ -5,10 +5,8 @@ import com.issue.tracker.api.persistence.auth.SaveUserRequestModel;
 import com.issue.tracker.api.persistence.auth.UserDsResponseModel;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.inject.Inject;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 @Stateless
 public class AuthInteractor implements AuthInput, Serializable {
@@ -27,7 +25,6 @@ public class AuthInteractor implements AuthInput, Serializable {
                 registerRequestModel.getLastName(),
                 registerRequestModel.getUsername(),
                 registerRequestModel.getPassword(),
-                UUID.randomUUID().toString(),
                 registerRequestModel.getEmail()
         );
 
@@ -48,7 +45,7 @@ public class AuthInteractor implements AuthInput, Serializable {
 
     @Override
     public boolean login(LoginRequestModel loginRequestModel) {
-        return authDsGateway.existsByUsernameAndPasswordAndIsActivated(
+        return authDsGateway.existsByUsernameAndPassword(
                 loginRequestModel.getUsername(),
                 loginRequestModel.getPassword()
         );

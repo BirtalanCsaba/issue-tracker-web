@@ -1,6 +1,7 @@
 package com.issue.tracker.infra.persistence.kanban;
 
 import com.issue.tracker.infra.persistence.common.BaseEntity;
+import com.issue.tracker.infra.persistence.user.UserEntity;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -37,6 +38,34 @@ public class KanbanEntity extends BaseEntity<Long> {
     public KanbanEntity(String title, String description) {
         this.title = title;
         this.description = description;
+    }
+
+    public List<UserEntity> getOwners() {
+        return users.stream()
+                .filter(u -> u.getRole() == KanbanUserRole.OWNER)
+                .map(KanbanUserEntity::getUser)
+                .toList();
+    }
+
+    public List<Long> getOwnerIds() {
+        return users.stream()
+                .filter(u -> u.getRole() == KanbanUserRole.OWNER)
+                .map(u -> u.getUser().getId())
+                .toList();
+    }
+
+    public List<UserEntity> getParticipants() {
+        return users.stream()
+                .filter(u -> u.getRole() == KanbanUserRole.PARTICIPANT)
+                .map(KanbanUserEntity::getUser)
+                .toList();
+    }
+
+    public List<Long> getParticipantsIds() {
+        return users.stream()
+                .filter(u -> u.getRole() == KanbanUserRole.PARTICIPANT)
+                .map(u -> u.getUser().getId())
+                .toList();
     }
 
     public KanbanEntity(Long aLong, String title, String description) {

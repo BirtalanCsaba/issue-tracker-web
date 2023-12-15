@@ -8,4 +8,8 @@ public class BCryptManager {
     public static String encrypt(String value) {
         return encoder.encode(value);
     }
+
+    public static boolean matches(String rawPassword, String encodedPassword) {
+        return encoder.matches(rawPassword, encodedPassword);
+    }
 }

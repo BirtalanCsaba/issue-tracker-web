@@ -26,8 +26,9 @@ dependencies {
     earlib(group = libs.slf4j.log4j.get().group, name = libs.slf4j.log4j.get().name, version = libs.slf4j.log4j.get().version, ext = "jar")
     earlib(group = libs.hibernate.jpamodelgen.get().group, name = libs.hibernate.jpamodelgen.get().name, version = libs.hibernate.jpamodelgen.get().version, ext = "jar")
     earlib(group = libs.jetbrains.kotlinx.datetime.get().group, name = libs.jetbrains.kotlinx.datetime.get().name, version = libs.jetbrains.kotlinx.datetime.get().version, ext = "jar")
-    earlib(group = libs.fasterxml.jackson.databind.get().group, name = libs.fasterxml.jackson.databind.get().name, version = libs.fasterxml.jackson.databind.get().version, ext = "jar")
+//    earlib(group = libs.fasterxml.jackson.databind.get().group, name = libs.fasterxml.jackson.databind.get().name, version = libs.fasterxml.jackson.databind.get().version, ext = "jar")
     earlib(group = libs.spring.security.crypto.get().group, name = libs.spring.security.crypto.get().name, version = libs.spring.security.crypto.get().version, ext = "jar")
+    earlib(group = libs.auth0.jwt.get().group, name = libs.auth0.jwt.get().name, version = libs.auth0.jwt.get().version, ext = "jar")
 }
 
 val buildTask by tasks.named("build")

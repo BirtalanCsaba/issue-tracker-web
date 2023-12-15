@@ -1,5 +1,6 @@
 package com.issue.tracker.api.kanban;
 
+import com.issue.tracker.api.ApiException;
 import com.issue.tracker.api.persistence.kanban.CreateKanbanDsRequestModel;
 import com.issue.tracker.api.persistence.kanban.KanbanDsGateway;
 import com.issue.tracker.api.persistence.kanban.KanbanDsResponseModel;
@@ -32,13 +33,32 @@ public class KanbanInteractor implements KanbanManagerInput {
                 response.getId(),
                 response.getTitle(),
                 response.getDescription(),
-                response.getOwnerId(),
+                response.getOwners(),
                 response.getParticipants()
         );
     }
 
     @Override
-    public List<KanbanResponseModel> findAllEnrolledKanbanForUser(Long userId) {
-        return null;
+    public List<KanbanResponseModel> findAllEnrolledKanbansForUser(Long userId) {
+        List<KanbanDsResponseModel> kanbans = kanbanDsGateway.findAllByUserId(userId);
+        return kanbans.stream()
+                .map(k -> new KanbanResponseModel(
+                        k.getId(),
+                        k.getTitle(),
+                        k.getDescription(),
+                        k.getOwners(),
+                        k.getParticipants()
+                )).toList();
+    }
+
+    @Override
+    public void removeKanbanById(Long kanbanId) {
+        if (kanbanId == null) {
+            throw new ApiException("Kanban ID is null");
+        }
+        if (kanbanDsGateway.findById(kanbanId) == null) {
+            throw new ApiException("Kanban not found with id: " + kanbanId);
+        }
+        kanbanDsGateway.removeById(kanbanId);
     }
 }

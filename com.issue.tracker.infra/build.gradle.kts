@@ -10,4 +10,5 @@ dependencies {
     implementation(libs.slf4j.log4j)
     compileOnly(libs.jakarta.ee)
     implementation(libs.spring.security.crypto)
+    implementation(libs.auth0.jwt)
 }

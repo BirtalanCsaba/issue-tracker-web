@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
+@Table(name = "application_user")
 public class UserEntity extends BaseEntity<Long> {
     @Column(unique = true, length = 60)
     private String username;
@@ -27,12 +28,6 @@ public class UserEntity extends BaseEntity<Long> {
 
     @Column(length = 255, unique = true)
     private String email;
-
-    @Column(length = 32)
-    private String emailConfirmationToken;
-
-    @Column
-    private Boolean activated = false;
 
     @ManyToMany
     @JoinTable(
@@ -56,13 +51,12 @@ public class UserEntity extends BaseEntity<Long> {
 
     }
 
-    public UserEntity(String username, String password, String firstName, String lastName, String email, String emailConfirmationToken) {
+    public UserEntity(String username, String password, String firstName, String lastName, String email) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.emailConfirmationToken = emailConfirmationToken;
     }
 
     public String getUsername() {
@@ -95,22 +89,6 @@ public class UserEntity extends BaseEntity<Long> {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public Boolean getActivated() {
-        return activated;
-    }
-
-    public void setActivated(Boolean activated) {
-        this.activated = activated;
-    }
-
-    public String getEmailConfirmationToken() {
-        return emailConfirmationToken;
-    }
-
-    public void setEmailConfirmationToken(String emailConfirmationToken) {
-        this.emailConfirmationToken = emailConfirmationToken;
     }
 
     public String getEmail() {
