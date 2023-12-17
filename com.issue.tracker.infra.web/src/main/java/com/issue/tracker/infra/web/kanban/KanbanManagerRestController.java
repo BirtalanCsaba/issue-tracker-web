@@ -1,20 +1,22 @@
 package com.issue.tracker.infra.web.kanban;
 
 import com.issue.tracker.api.auth.AuthInput;
+import com.issue.tracker.api.auth.UserNotAuthorizedException;
 import com.issue.tracker.api.kanban.CreateKanbanRequestModel;
 import com.issue.tracker.api.kanban.KanbanManagerInput;
+import com.issue.tracker.api.kanban.UpdateKanbanRequestModel;
 import com.issue.tracker.api.logger.LogType;
 import com.issue.tracker.api.logger.LoggerBuilder;
 import com.issue.tracker.infra.web.auth.Authenticated;
+import com.issue.tracker.infra.web.common.GenericErrorResponse;
 import jakarta.ejb.EJB;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+
+import java.util.Arrays;
 
 @Path("/kanban")
 @Authenticated
@@ -49,11 +51,84 @@ public class KanbanManagerRestController {
             loggerBuilder.create(
                             getClass(),
                             LogType.ERROR,
-                            "Kanban creation failed"
+                            ex.getMessage()
                     )
                     .build()
                     .print();
-            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Kanban creation failed");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @PUT
+    public Response update(@Context SecurityContext securityContext,
+                           UpdateKanbanRequestModel kanban) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            kanbanManager.update(kanban, currentAuthenticatedUser.getId());
+            return Response.ok().build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Cannot get kanbans for user");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @GET
+    @Path("/user/{userId}")
+    public Response findAllForUser(@PathParam("userId") Long userId) {
+        try {
+            return Response.ok(kanbanManager.findAllEnrolledKanbansForUser(userId)).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Cannot get kanbans for user");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @DELETE
+    @Path("/{kanbanId}")
+    public Response delete(
+            @PathParam("kanbanId") Long kanbanId,
+            @Context SecurityContext securityContext) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            kanbanManager.removeKanbanById(currentAuthenticatedUser.getId(), kanbanId);
+            return Response.ok().build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
     }
 }

@@ -10,6 +10,7 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,11 +85,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
 
     @Override
     public KanbanDsResponseModel findById(Long id) {
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<KanbanEntity> criteriaQuery = criteriaBuilder.createQuery(KanbanEntity.class);
-        Root<KanbanEntity> root = criteriaQuery.from(KanbanEntity.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(KanbanEntity_.ID), id));
-        KanbanEntity result = em.createQuery(criteriaQuery).getSingleResult();
+        KanbanEntity result = kanbanRepository.findById(id);
 
         return new KanbanDsResponseModel(
                 result.getId(),
@@ -102,11 +99,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
 
     @Override
     public KanbanDsResponseModel findByTitle(String title) {
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<KanbanEntity> criteriaQuery = criteriaBuilder.createQuery(KanbanEntity.class);
-        Root<KanbanEntity> root = criteriaQuery.from(KanbanEntity.class);
-        criteriaQuery.where(criteriaBuilder.equal(root.get(KanbanEntity_.TITLE), title));
-        KanbanEntity result = em.createQuery(criteriaQuery).getSingleResult();
+        KanbanEntity result = kanbanRepository.findByTitle(title);
 
         return new KanbanDsResponseModel(
                 result.getId(),
@@ -119,53 +112,67 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
-    public KanbanDsResponseModel update(UpdateKanbanDsRequestModel kanban) {
-        return null;
+    public void update(UpdateKanbanDsRequestModel kanban) {
+        kanbanRepository.update(new KanbanEntity(
+                kanban.getId(),
+                kanban.getTitle(),
+                kanban.getDescription()
+        ));
     }
 
     @Override
-    public List<KanbanDsResponseModel> findAllByUserId(Long userId) {
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<KanbanEntity> criteriaQuery = criteriaBuilder.createQuery(KanbanEntity.class);
-        Root<KanbanEntity> parentRoot = criteriaQuery.from(KanbanEntity.class);
+    public List<EnrolledKanbanDsResponseModel> findAllByUserId(Long userId) {
+        List<EnrolledKanbanDsResponseModel> result = new ArrayList<>();
 
-        // KanbanUserEntity join
-        Join<KanbanEntity, KanbanUserEntity> kanbanUserJoin = parentRoot.join(KanbanEntity_.USERS);
+        // Retrieve enrollments
+        List<KanbanUserEntity> enrollments = kanbanRepository.findEnrollments(userId);
+        for (var enrollment : enrollments) {
+            result.add(new EnrolledKanbanDsResponseModel(
+                    enrollment.getKanban().getId(),
+                    enrollment.getKanban().getTitle(),
+                    enrollment.getKanban().getDescription(),
+                    enrollment.getKanban().getOwner().getId(),
+                    enrollment.getKanban().getAdminIds(),
+                    enrollment.getKanban().getParticipantsIds(),
+                    enrollment.convertUserRoleToString()
+            ));
+        }
 
-        // UserEntity join
-        Join<KanbanEntity, KanbanUserEntity> userJoin = kanbanUserJoin.join(KanbanUserEntity_.USER);
+        // Retrieve where user is owner
+        // TODO: create a named entity graph
+        List<KanbanEntity> whereOwner = kanbanRepository.findOwningKanbans(userId);
+        for (var kanban : whereOwner) {
+            result.add(new EnrolledKanbanDsResponseModel(
+                    kanban.getId(),
+                    kanban.getTitle(),
+                    kanban.getDescription(),
+                    userId,
+                    kanban.getAdminIds(),
+                    kanban.getParticipantsIds(),
+                    "OWNER"
+            ));
+        }
 
-        // Add a predicate to filter by childProperty
-        criteriaQuery.where(criteriaBuilder.equal(userJoin.get(UserEntity_.ID), userId));
+        return result;
+    }
 
-        // Remove duplicates caused by the join
-        criteriaQuery.distinct(true);
+    @Override
+    public boolean isOwner(Long userId, Long kanbanId) {
+        return kanbanRepository.isOwner(userId, kanbanId);
+    }
 
-        // Execute the query and retrieve the result
-        List<KanbanEntity> result = em.createQuery(criteriaQuery).getResultList();
+    @Override
+    public boolean isAdmin(Long userId, Long kanbanId) {
+        return kanbanRepository.isAdmin(userId, kanbanId);
+    }
 
-        return result.stream().map(k -> new KanbanDsResponseModel(
-                k.getId(),
-                k.getTitle(),
-                k.getDescription(),
-                k.getOwner().getId(),
-                k.getAdminIds(),
-                k.getParticipantsIds()
-        )).toList();
+    @Override
+    public boolean isParticipant(Long userId, Long kanbanId) {
+        return kanbanRepository.isAdmin(userId, kanbanId);
     }
 
     @Override
     public void removeById(Long id) {
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaDelete<UserEntity> delete = criteriaBuilder.createCriteriaDelete(UserEntity.class);
-        Root<UserEntity> root = delete.from(UserEntity.class);
-
-        // Add a predicate to the delete query to filter by ID
-        delete.where(criteriaBuilder.equal(root.get(UserEntity_.ID), id));
-
-        // Execute the delete query
-        em.createQuery(delete).executeUpdate();
-
-        em.getTransaction().commit();
+        kanbanRepository.removeById(id);
     }
 }

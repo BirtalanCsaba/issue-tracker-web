@@ -2,14 +2,14 @@ package com.issue.tracker.infra.web.common;
 
 import java.io.Serializable;
 
-public class ErrorServletResponse implements Serializable {
+public class GenericErrorResponse implements Serializable {
     String exception;
 
-    public ErrorServletResponse() {
+    public GenericErrorResponse() {
 
     }
 
-    public ErrorServletResponse(String exception) {
+    public GenericErrorResponse(String exception) {
         this.exception = exception;
     }
 

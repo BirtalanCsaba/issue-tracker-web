@@ -29,22 +29,11 @@ public class UserEntity extends BaseEntity<Long> {
     @Column(length = 255, unique = true)
     private String email;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "users_issues",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "issue_id"))
-    private List<IssueEntity> issues;
-
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.DETACH,
-                    CascadeType.MERGE,
-                    CascadeType.PERSIST,
-                    CascadeType.REFRESH,
-            }
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<KanbanUserEntity> kanbans;
 
@@ -106,14 +95,6 @@ public class UserEntity extends BaseEntity<Long> {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public List<IssueEntity> getIssues() {
-        return issues;
-    }
-
-    public void setIssues(List<IssueEntity> issues) {
-        this.issues = issues;
     }
 
     public List<KanbanUserEntity> getKanbans() {

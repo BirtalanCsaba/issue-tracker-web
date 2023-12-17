@@ -1,9 +1,8 @@
 package com.issue.tracker.api.kanban;
 
 import com.issue.tracker.api.ApiException;
-import com.issue.tracker.api.persistence.kanban.CreateKanbanDsRequestModel;
-import com.issue.tracker.api.persistence.kanban.KanbanDsGateway;
-import com.issue.tracker.api.persistence.kanban.KanbanDsResponseModel;
+import com.issue.tracker.api.auth.UserNotAuthorizedException;
+import com.issue.tracker.api.persistence.kanban.*;
 import com.issue.tracker.domain.kanban.BaseKanbanFactory;
 import com.issue.tracker.domain.kanban.Kanban;
 import com.issue.tracker.domain.kanban.KanbanFactory;
@@ -45,25 +44,38 @@ public class KanbanInteractor implements KanbanManagerInput {
     }
 
     @Override
-    public List<KanbanResponseModel> findAllEnrolledKanbansForUser(Long userId) {
-        List<KanbanDsResponseModel> kanbans = kanbanDsGateway.findAllByUserId(userId);
+    public void update(UpdateKanbanRequestModel kanban, Long userId) {
+        if (!kanbanDsGateway.isAdmin(userId, kanban.getId())) {
+            throw new UserNotAuthorizedException("User with id: " + userId + " is not the owner of the kanban with id: " + kanban.getId());
+        }
+        kanbanDsGateway.update(new UpdateKanbanDsRequestModel(
+                kanban.getId(),
+                kanban.getTitle(),
+                kanban.getDescription()
+        ));
+    }
+
+    @Override
+    public List<EnrolledKanbanResponseModel> findAllEnrolledKanbansForUser(Long userId) {
+        List<EnrolledKanbanDsResponseModel> kanbans = kanbanDsGateway.findAllByUserId(userId);
         return kanbans.stream()
-                .map(k -> new KanbanResponseModel(
+                .map(k -> new EnrolledKanbanResponseModel(
                         k.getId(),
                         k.getTitle(),
                         k.getDescription(),
                         k.getAdmins(),
-                        k.getParticipants()
+                        k.getParticipants(),
+                        k.getRole()
                 )).toList();
     }
 
     @Override
-    public void removeKanbanById(Long kanbanId) {
+    public void removeKanbanById(Long userId, Long kanbanId) {
         if (kanbanId == null) {
             throw new ApiException("Kanban ID is null");
         }
-        if (kanbanDsGateway.findById(kanbanId) == null) {
-            throw new ApiException("Kanban not found with id: " + kanbanId);
+        if (!kanbanDsGateway.isOwner(userId, kanbanId)) {
+            throw new UserNotAuthorizedException("User with id: " + userId + " is not the owner of the kanban with id: " + kanbanId);
         }
         kanbanDsGateway.removeById(kanbanId);
     }

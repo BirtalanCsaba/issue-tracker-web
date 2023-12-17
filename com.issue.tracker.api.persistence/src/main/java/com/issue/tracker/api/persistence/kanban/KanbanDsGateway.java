@@ -12,9 +12,15 @@ public interface KanbanDsGateway {
 
     KanbanDsResponseModel findByTitle(String title);
 
-    KanbanDsResponseModel update(UpdateKanbanDsRequestModel kanban);
+    void update(UpdateKanbanDsRequestModel kanban);
 
-    List<KanbanDsResponseModel> findAllByUserId(Long userId);
+    List<EnrolledKanbanDsResponseModel> findAllByUserId(Long userId);
+
+    boolean isOwner(Long userId, Long kanbanId);
+
+    boolean isAdmin(Long userId, Long kanbanId);
+
+    boolean isParticipant(Long userId, Long kanbanId);
 
     void removeById(Long id);
 }

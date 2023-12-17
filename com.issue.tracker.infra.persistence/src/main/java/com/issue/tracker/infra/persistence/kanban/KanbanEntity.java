@@ -18,10 +18,8 @@ public class KanbanEntity extends BaseEntity<Long> {
     @Column(length = 255)
     private String description;
 
-    @OneToMany(mappedBy = "kanban")
-    private List<IssueEntity> issues;
-
     @OneToMany(
+            fetch = FetchType.LAZY,
             mappedBy = "kanban",
             cascade = {
                     CascadeType.DETACH,
@@ -30,9 +28,25 @@ public class KanbanEntity extends BaseEntity<Long> {
                     CascadeType.REFRESH,
             }
     )
+    private List<IssueEntity> issues;
+
+    @OneToMany(
+            mappedBy = "kanban",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<KanbanUserEntity> users = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.DETACH,
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST,
+                    CascadeType.REFRESH,
+            }
+    )
     @JoinColumn(name = "owner_id", nullable = false)
     private UserEntity owner;
 
@@ -43,6 +57,12 @@ public class KanbanEntity extends BaseEntity<Long> {
         this.title = title;
         this.description = description;
         this.owner = owner;
+    }
+
+    public KanbanEntity(Long aLong, String title, String description) {
+        super(aLong);
+        this.title = title;
+        this.description = description;
     }
 
     public KanbanEntity(Long aLong, String title, String description, UserEntity owner) {

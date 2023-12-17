@@ -29,9 +29,6 @@ public class IssueEntity extends BaseEntity<Long> {
     @JoinColumn(name="kanban_id", nullable=false)
     private KanbanEntity kanban;
 
-    @ManyToMany(mappedBy = "issues")
-    private List<UserEntity> users;
-
     public IssueEntity() {
     }
 
@@ -98,13 +95,5 @@ public class IssueEntity extends BaseEntity<Long> {
 
     public void setKanban(KanbanEntity kanban) {
         this.kanban = kanban;
-    }
-
-    public List<UserEntity> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<UserEntity> users) {
-        this.users = users;
     }
 }

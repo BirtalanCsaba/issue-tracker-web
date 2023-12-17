@@ -13,12 +13,18 @@ public class KanbanUserEntity implements Serializable {
     @EmbeddedId
     private KanbanUserPK id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
+    )
     @MapsId("kanbanId")
     @JoinColumn(name = "kanban_id")
     private KanbanEntity kanban;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL
+    )
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private UserEntity user;
@@ -32,6 +38,10 @@ public class KanbanUserEntity implements Serializable {
 
     public KanbanUserEntity(KanbanUserPK id) {
         this.id = id;
+    }
+
+    public String convertUserRoleToString() {
+        return role == KanbanUserRole.ADMIN ? "ADMIN" : "PARTICIPANT";
     }
 
     public KanbanUserPK getId() {

@@ -8,7 +8,9 @@ import java.util.List;
 public interface KanbanManagerInput {
     KanbanResponseModel create(CreateKanbanRequestModel kanban);
 
-    List<KanbanResponseModel> findAllEnrolledKanbansForUser(Long userId);
+    void update(UpdateKanbanRequestModel kanban, Long userId);
 
-    void removeKanbanById(Long kanbanId);
+    List<EnrolledKanbanResponseModel> findAllEnrolledKanbansForUser(Long userId);
+
+    void removeKanbanById(Long userId, Long kanbanId);
 }

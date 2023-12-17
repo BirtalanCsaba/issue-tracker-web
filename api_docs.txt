@@ -1,0 +1,51 @@
+Register:
+POST: http://localhost:8080/issue-tracker/api/v1/auth/register
+- no authentication required
+{
+    "username": "test",
+    "password": "test",
+    "firstName": "test",
+    "lastName": "test",
+    "email": "test@gmail.com"
+}
+
+Login:
+POST: http://localhost:8080/issue-tracker/api/v1/auth/login
+{
+    "username": "test",
+    "password": "test"
+}
+
+Create Kanban:
+POST: http://localhost:8080/issue-tracker/api/v1/kanban
+{
+    "title": "test",
+    "description": "test",
+    "admins": [3],
+    "participants": [2]
+}
+- need to declare header (key-value pair):
+Authorization: Bearer <access_token from login>
+- the owner of the Kanban is the currently authenticated user
+
+Update Kanban:
+PUT: http://localhost:8080/issue-tracker/api/v1/kanban
+{
+    "title": "test",
+    "description": "test",
+    "admins": [3],
+    "participants": [2]
+}
+- need to declare header (key-value pair):
+Authorization: Bearer <access_token from login>
+- Only users that are admins to the kanban can change this
+
+Remove Kanban:
+DELETE http://localhost:8080/issue-tracker/api/v1/kanban/1
+- need to declare header (key-value pair):
+Authorization: Bearer <access_token from login>
+
+Find Kanbans where user is either an owner or participant/admin
+http://localhost:8080/issue-tracker/api/v1/kanban/user/2
+- need to declare header (key-value pair):
+Authorization: Bearer <access_token from login>
