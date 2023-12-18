@@ -19,4 +19,6 @@ public interface KanbanRepository extends BaseRepository<KanbanEntity, Long> {
     boolean isAdmin(Long userId, Long kanbanId);
 
     boolean isParticipant(Long userId, Long kanbanId);
+
+    KanbanEntity findByIdWithUsers(Long kanbanId);
 }

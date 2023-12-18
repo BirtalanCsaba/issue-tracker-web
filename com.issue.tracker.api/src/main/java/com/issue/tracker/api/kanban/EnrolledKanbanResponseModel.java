@@ -9,8 +9,8 @@ public class EnrolledKanbanResponseModel extends KanbanResponseModel {
 
     }
 
-    public EnrolledKanbanResponseModel(Long id, String title, String description, List<Long> admins, List<Long> participants, String role) {
-        super(id, title, description, admins, participants);
+    public EnrolledKanbanResponseModel(Long id, String title, String description, Long ownerId, List<Long> admins, List<Long> participants, String role) {
+        super(id, title, description, ownerId, admins, participants);
         this.role = role;
     }
 

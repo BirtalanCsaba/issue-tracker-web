@@ -1,18 +1,14 @@
 package com.issue.tracker.infra.persistence.kanban;
 
-import com.issue.tracker.api.persistence.auth.AuthDsGateway;
+import com.issue.tracker.api.persistence.auth.UserDsCompleteResponseModel;
+import com.issue.tracker.api.persistence.auth.UserDsResponseModel;
 import com.issue.tracker.api.persistence.kanban.*;
 import com.issue.tracker.infra.persistence.user.UserEntity;
-import com.issue.tracker.infra.persistence.user.UserEntity_;
 import com.issue.tracker.infra.persistence.user.UserRepository;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -87,28 +83,63 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     public KanbanDsResponseModel findById(Long id) {
         KanbanEntity result = kanbanRepository.findById(id);
 
-        return new KanbanDsResponseModel(
+        return result != null ? new KanbanDsResponseModel(
                 result.getId(),
                 result.getTitle(),
                 result.getDescription(),
                 result.getOwner().getId(),
                 result.getAdminIds(),
                 result.getParticipantsIds()
-        );
+        ) : null;
+    }
+
+    @Override
+    public KanbanDsCompleteResponseModel findCompleteById(Long id) {
+        KanbanEntity result = kanbanRepository.findByIdWithUsers(id);
+        return result != null ? new KanbanDsCompleteResponseModel(
+                result.getId(),
+                result.getTitle(),
+                result.getDescription(),
+                result.getAdmins().stream().map(u ->
+                        new UserDsResponseModel(
+                                u.getId(),
+                                u.getFirstName(),
+                                u.getLastName(),
+                                u.getUsername(),
+                                u.getEmail()
+                        )
+                ).toList(),
+                result.getParticipants().stream().map(u ->
+                        new UserDsResponseModel(
+                                u.getId(),
+                                u.getFirstName(),
+                                u.getLastName(),
+                                u.getUsername(),
+                                u.getEmail()
+                        )
+                ).toList(),
+                new UserDsResponseModel(
+                        result.getOwner().getId(),
+                        result.getOwner().getFirstName(),
+                        result.getOwner().getLastName(),
+                        result.getOwner().getUsername(),
+                        result.getOwner().getEmail()
+                )
+        ) : null;
     }
 
     @Override
     public KanbanDsResponseModel findByTitle(String title) {
         KanbanEntity result = kanbanRepository.findByTitle(title);
 
-        return new KanbanDsResponseModel(
+        return result != null ? new KanbanDsResponseModel(
                 result.getId(),
                 result.getTitle(),
                 result.getDescription(),
                 result.getOwner().getId(),
                 result.getAdminIds(),
                 result.getParticipantsIds()
-        );
+        ) : null;
     }
 
     @Override
@@ -138,8 +169,6 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
             ));
         }
 
-        // Retrieve where user is owner
-        // TODO: create a named entity graph
         List<KanbanEntity> whereOwner = kanbanRepository.findOwningKanbans(userId);
         for (var kanban : whereOwner) {
             result.add(new EnrolledKanbanDsResponseModel(

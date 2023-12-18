@@ -1,30 +1,32 @@
 package com.issue.tracker.api.kanban;
 
+import com.issue.tracker.api.persistence.auth.UserDsResponseModel;
+
 import java.util.List;
 
-public class KanbanResponseModel {
+public class KanbanCompleteResponseModel {
     private Long id;
 
     private String title;
 
     private String description;
 
-    private List<Long> admins;
+    private List<UserDsResponseModel> admins;
 
-    private List<Long> participants;
+    private List<UserDsResponseModel> participants;
 
-    private Long ownerId;
+    private UserDsResponseModel owner;
 
-    public KanbanResponseModel() {
+    public KanbanCompleteResponseModel() {
     }
 
-    public KanbanResponseModel(Long id, String title, String description, Long ownerId, List<Long> admins, List<Long> participants) {
+    public KanbanCompleteResponseModel(Long id, String title, String description, List<UserDsResponseModel> admins, List<UserDsResponseModel> participants, UserDsResponseModel owner) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.admins = admins;
         this.participants = participants;
-        this.ownerId = ownerId;
+        this.owner = owner;
     }
 
     public Long getId() {
@@ -51,27 +53,27 @@ public class KanbanResponseModel {
         this.description = description;
     }
 
-    public List<Long> getAdmins() {
+    public List<UserDsResponseModel> getAdmins() {
         return admins;
     }
 
-    public void setAdmins(List<Long> admins) {
+    public void setAdmins(List<UserDsResponseModel> admins) {
         this.admins = admins;
     }
 
-    public List<Long> getParticipants() {
+    public List<UserDsResponseModel> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<Long> participants) {
+    public void setParticipants(List<UserDsResponseModel> participants) {
         this.participants = participants;
     }
 
-    public Long getOwnerId() {
-        return ownerId;
+    public UserDsResponseModel getOwner() {
+        return owner;
     }
 
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
+    public void setOwner(UserDsResponseModel owner) {
+        this.owner = owner;
     }
 }

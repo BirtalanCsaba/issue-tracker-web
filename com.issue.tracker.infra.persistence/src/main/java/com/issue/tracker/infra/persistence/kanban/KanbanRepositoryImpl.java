@@ -4,12 +4,15 @@ import com.issue.tracker.infra.persistence.user.BaseRepositoryProvider;
 import com.issue.tracker.infra.persistence.user.UserEntity;
 import com.issue.tracker.infra.persistence.user.UserEntity_;
 import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class KanbanRepositoryImpl extends BaseRepositoryProvider<KanbanEntity, Long> implements KanbanRepository {
@@ -96,5 +99,17 @@ public class KanbanRepositoryImpl extends BaseRepositoryProvider<KanbanEntity, L
         typedQuery.setParameter("userId", userId);
         typedQuery.setParameter("kanbanId", kanbanId);
         return typedQuery.getSingleResult();
+    }
+
+    @Override
+    public KanbanEntity findByIdWithUsers(Long kanbanId) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<KanbanEntity> criteriaQuery = criteriaBuilder.createQuery(KanbanEntity.class);
+        Root<KanbanEntity> root = criteriaQuery.from(KanbanEntity.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get(KanbanEntity_.ID), kanbanId));
+        EntityGraph<?> entityGraph = em.getEntityGraph("user-participant");
+        TypedQuery<KanbanEntity> query = em.createQuery(criteriaQuery);
+        query.setHint("jakarta.persistence.loadgraph", entityGraph);
+        return em.createQuery(criteriaQuery).getSingleResult();
     }
 }

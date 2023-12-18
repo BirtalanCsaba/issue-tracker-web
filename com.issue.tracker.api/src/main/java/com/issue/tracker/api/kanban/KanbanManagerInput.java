@@ -13,4 +13,8 @@ public interface KanbanManagerInput {
     List<EnrolledKanbanResponseModel> findAllEnrolledKanbansForUser(Long userId);
 
     void removeKanbanById(Long userId, Long kanbanId);
+
+    KanbanResponseModel findById(Long kanbanId);
+
+    KanbanCompleteResponseModel findCompleteById(Long kanbanId);
 }

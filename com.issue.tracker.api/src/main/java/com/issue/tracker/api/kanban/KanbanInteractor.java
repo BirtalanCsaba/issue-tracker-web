@@ -38,6 +38,7 @@ public class KanbanInteractor implements KanbanManagerInput {
                 response.getId(),
                 response.getTitle(),
                 response.getDescription(),
+                response.getOwnerId(),
                 response.getAdmins(),
                 response.getParticipants()
         );
@@ -48,10 +49,14 @@ public class KanbanInteractor implements KanbanManagerInput {
         if (!kanbanDsGateway.isAdmin(userId, kanban.getId())) {
             throw new UserNotAuthorizedException("User with id: " + userId + " is not the owner of the kanban with id: " + kanban.getId());
         }
-        kanbanDsGateway.update(new UpdateKanbanDsRequestModel(
-                kanban.getId(),
+        Kanban updatedKanban = kanbanFactory.create(
                 kanban.getTitle(),
                 kanban.getDescription()
+        );
+        kanbanDsGateway.update(new UpdateKanbanDsRequestModel(
+                kanban.getId(),
+                updatedKanban.getTitle(),
+                updatedKanban.getDescription()
         ));
     }
 
@@ -63,6 +68,7 @@ public class KanbanInteractor implements KanbanManagerInput {
                         k.getId(),
                         k.getTitle(),
                         k.getDescription(),
+                        k.getOwnerId(),
                         k.getAdmins(),
                         k.getParticipants(),
                         k.getRole()
@@ -78,5 +84,31 @@ public class KanbanInteractor implements KanbanManagerInput {
             throw new UserNotAuthorizedException("User with id: " + userId + " is not the owner of the kanban with id: " + kanbanId);
         }
         kanbanDsGateway.removeById(kanbanId);
+    }
+
+    @Override
+    public KanbanResponseModel findById(Long kanbanId) {
+        var response = kanbanDsGateway.findById(kanbanId);
+        return response != null ? new KanbanResponseModel(
+                response.getId(),
+                response.getTitle(),
+                response.getDescription(),
+                response.getOwnerId(),
+                response.getAdmins(),
+                response.getParticipants()
+        ) : null;
+    }
+
+    @Override
+    public KanbanCompleteResponseModel findCompleteById(Long kanbanId) {
+        var response = kanbanDsGateway.findCompleteById(kanbanId);
+        return response != null ? new KanbanCompleteResponseModel(
+                response.getId(),
+                response.getTitle(),
+                response.getDescription(),
+                response.getAdmins(),
+                response.getParticipants(),
+                response.getOwner()
+        ) : null;
     }
 }

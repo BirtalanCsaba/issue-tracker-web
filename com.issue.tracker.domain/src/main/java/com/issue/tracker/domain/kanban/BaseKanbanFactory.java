@@ -23,6 +23,13 @@ public class BaseKanbanFactory implements KanbanFactory {
         return new Kanban(title, description, ownerId, admins, participants);
     }
 
+    @Override
+    public Kanban create(String title, String description) {
+        title = sanitizeString(title);
+        description = sanitizeString(description);
+        return new Kanban(title, description);
+    }
+
     String sanitizeString(String value) {
         return value.trim();
     }
