@@ -136,11 +136,7 @@ public class KanbanInteractor implements KanbanManagerInput {
 
         List<PhaseDsResponseModel> phases;
 
-//        if (currentBucket >= 2) {
         phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
-//        } else {
-//            phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
-//        }
 
         long rankingSize = phases.size();
 
