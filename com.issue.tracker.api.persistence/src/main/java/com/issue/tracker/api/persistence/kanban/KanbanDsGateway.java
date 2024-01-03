@@ -11,6 +11,8 @@ public interface KanbanDsGateway {
 
     KanbanDsResponseModel findById(Long id);
 
+    KanbanDsCompleteResponseModel findCompleteById(Long id);
+
     KanbanDsResponseModel findByTitle(String title);
 
     void update(UpdateKanbanDsRequestModel kanban);
@@ -38,4 +40,6 @@ public interface KanbanDsGateway {
     PhaseDsResponseModel addPhase(CreatePhaseRequestModel phase);
 
     void updatePhases(List<UpdatePhaseRequestModel> phases);
+
+    PhaseDsResponseModel findPhaseById(Long phaseId);
 }

@@ -17,4 +17,9 @@ public interface KanbanManagerInput {
     PhaseResponseModel addPhase(Long userId, Long kanbanId, String title);
 
     void reIndex(Long kanbanId);
+
+    KanbanResponseModel findById(Long kanbanId);
+
+    KanbanCompleteResponseModel findCompleteById(Long kanbanId);
+
 }

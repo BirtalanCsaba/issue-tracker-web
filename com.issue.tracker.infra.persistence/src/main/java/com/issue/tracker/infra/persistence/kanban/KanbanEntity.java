@@ -35,7 +35,7 @@ public class KanbanEntity extends BaseEntity<Long> {
                     CascadeType.REFRESH,
             }
     )
-    private List<IssueEntity> issues;
+    private List<IssueEntity> issues = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "kanban",
@@ -58,7 +58,7 @@ public class KanbanEntity extends BaseEntity<Long> {
     private UserEntity owner;
 
     @OneToMany(mappedBy = "kanban")
-    private List<PhaseEntity> phase;
+    private List<PhaseEntity> phase = new ArrayList<>();
 
     public KanbanEntity() {
     }

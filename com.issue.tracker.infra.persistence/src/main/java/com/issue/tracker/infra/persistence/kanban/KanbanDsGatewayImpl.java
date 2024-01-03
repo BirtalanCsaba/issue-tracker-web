@@ -1,22 +1,31 @@
 package com.issue.tracker.infra.persistence.kanban;
 
+import com.issue.tracker.api.logger.LogType;
+import com.issue.tracker.api.logger.LoggerBuilder;
+import com.issue.tracker.api.persistence.auth.UserDsResponseModel;
 import com.issue.tracker.api.persistence.common.OrderingType;
 import com.issue.tracker.api.persistence.kanban.*;
+import com.issue.tracker.infra.logger.LoggerBuilderImpl;
 import com.issue.tracker.infra.persistence.user.UserEntity;
 import com.issue.tracker.infra.persistence.user.UserRepository;
-import jakarta.ejb.EJB;
-import jakarta.ejb.Stateless;
+import jakarta.annotation.Resource;
+import jakarta.ejb.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.UserTransaction;
 
 import java.util.*;
 
 @Stateless
+@TransactionManagement(TransactionManagementType.BEAN)
 public class KanbanDsGatewayImpl implements KanbanDsGateway {
     @PersistenceContext(unitName = "jpa")
     private EntityManager em;
+
+    @Resource
+    private SessionContext ctx;
 
     @EJB
     private KanbanRepository kanbanRepository;
@@ -28,6 +37,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     private PhaseRepository phaseRepository;
 
     @Override
+    @Transactional
     public KanbanDsResponseModel create(CreateKanbanDsRequestModel kanban) {
         UserEntity owner = userRepository.findById(kanban.getOwnerId());
         KanbanEntity kanbanEntity = kanbanRepository.save(
@@ -84,6 +94,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
     public KanbanDsResponseModel findById(Long id) {
         KanbanEntity result = kanbanRepository.findById(id);
 
@@ -98,6 +109,39 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
+    public KanbanDsCompleteResponseModel findCompleteById(Long id) {
+        KanbanEntity kanban = kanbanRepository.findById(id);
+        return new KanbanDsCompleteResponseModel(
+                kanban.getId(),
+                kanban.getTitle(),
+                kanban.getDescription(),
+                kanban.getAdmins().stream().map(p -> new UserDsResponseModel(
+                        p.getId(),
+                        p.getFirstName(),
+                        p.getLastName(),
+                        p.getUsername(),
+                        p.getEmail()
+                )).toList(),
+                kanban.getParticipants().stream().map(p -> new UserDsResponseModel(
+                        p.getId(),
+                        p.getFirstName(),
+                        p.getLastName(),
+                        p.getUsername(),
+                        p.getEmail()
+                )).toList(),
+                new UserDsResponseModel(
+                        kanban.getOwner().getId(),
+                        kanban.getOwner().getFirstName(),
+                        kanban.getOwner().getLastName(),
+                        kanban.getOwner().getUsername(),
+                        kanban.getOwner().getEmail()
+                )
+        );
+    }
+
+    @Override
+    @Transactional
     public KanbanDsResponseModel findByTitle(String title) {
         KanbanEntity result = kanbanRepository.findByTitle(title);
 
@@ -112,6 +156,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
     public void update(UpdateKanbanDsRequestModel kanban) {
         kanbanRepository.update(new KanbanEntity(
                 kanban.getId(),
@@ -121,6 +166,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
     public List<EnrolledKanbanDsResponseModel> findAllByUserId(Long userId) {
         List<EnrolledKanbanDsResponseModel> result = new ArrayList<>();
 
@@ -155,31 +201,37 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
     public boolean isOwner(Long userId, Long kanbanId) {
         return kanbanRepository.isOwner(userId, kanbanId);
     }
 
     @Override
+    @Transactional
     public boolean isAdmin(Long userId, Long kanbanId) {
         return kanbanRepository.isAdmin(userId, kanbanId);
     }
 
     @Override
+    @Transactional
     public boolean isParticipant(Long userId, Long kanbanId) {
         return kanbanRepository.isParticipant(userId, kanbanId);
     }
 
     @Override
+    @Transactional
     public void removeById(Long id) {
         kanbanRepository.removeById(id);
     }
 
     @Override
+    @Transactional
     public long getPhaseCount(Long kanbanId) {
         return kanbanRepository.getPhaseCount(kanbanId);
     }
 
     @Override
+    @Transactional
     public void updatePhase(Long phaseId, String title, String rank) {
         String jpqlUpdate = "UPDATE PhaseEntity e SET e.title = :title, e.rank = :rank WHERE e.id = :id";
 
@@ -192,6 +244,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
     public PhaseDsResponseModel findFirstPhase(Long kanbanId) {
         PhaseEntity result = phaseRepository.findFirstPhaseForKanban(kanbanId);
         return new PhaseDsResponseModel(
@@ -202,11 +255,18 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
     public List<PhaseDsResponseModel> findAllPhasesForKanban(Long kanbanId) {
-
+        var result = findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
+        return result.stream().map(p -> new PhaseDsResponseModel(
+                p.getId(),
+                p.getRank(),
+                p.getTitle()
+        )).toList();
     }
 
     @Override
+    @Transactional
     public List<PhaseDsResponseModel> findAllPhasesForKanbanOrdered(Long kanbanId, OrderingType order) {
         List<PhaseEntity> result = phaseRepository.findAllPhasesForKanbanOrdered(kanbanId, order);
         return result.stream().map(p -> new PhaseDsResponseModel(
@@ -217,6 +277,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    @Transactional
     public PhaseDsResponseModel addPhase(CreatePhaseRequestModel phase) {
         KanbanEntity kanban = kanbanRepository.findById(phase.getKanbanId());
         PhaseEntity createdPhase = phaseRepository.save(new PhaseEntity(
@@ -228,33 +289,57 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 createdPhase.getId(),
                 createdPhase.getRank(),
                 createdPhase.getTitle()
-                );
+        );
     }
 
     @Override
     public void updatePhases(List<UpdatePhaseRequestModel> phases) {
+        UserTransaction transaction = ctx.getUserTransaction();
         try {
-        em.getTransaction().begin();
+            transaction.begin();
 
-        String query = "update PhaseEntity p set p.title=:title, p.rank=:rank where p.id=:phaseId";
+            String query = "update PhaseEntity p set p.title=:title, p.rank=:rank where p.id=:phaseId";
 
-        long count = 0;
-        for (var phase : phases) {
-            if (count >= 100) {
-                count = 0;
-                em.getTransaction().commit();
+            long count = 0;
+            for (var phase : phases) {
+                if (count >= 100) {
+                    count = 0;
+                    transaction.commit();
+                }
+                Query theQuery = em.createQuery(query);
+                theQuery.setParameter("title", phase.getTitle());
+                theQuery.setParameter("rank", phase.getRank());
+                theQuery.setParameter("phaseId", phase.getId());
+                theQuery.executeUpdate();
+                count++;
             }
-            Query theQuery = em.createQuery(query);
-            theQuery.setParameter("title", phase.getTitle());
-            theQuery.setParameter("rank", phase.getRank());
-            theQuery.executeUpdate();
-            count++;
-        }
-
+            transaction.commit();
         } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
+            try {
+                transaction.rollback();
+            } catch (Exception rollbackException) {
+                // Handle rollback exception if necessary
+                LoggerBuilderImpl loggerBuilder = new LoggerBuilderImpl();
+                loggerBuilder.create(getClass(), LogType.ERROR, rollbackException.getMessage())
+                .build()
+                .print();
             }
+
+            // Handle the original exception
+            LoggerBuilderImpl loggerBuilder = new LoggerBuilderImpl();
+            loggerBuilder.create(getClass(), LogType.ERROR, e.getMessage())
+                    .build()
+                    .print();
         }
+    }
+
+    @Override
+    public PhaseDsResponseModel findPhaseById(Long phaseId) {
+        PhaseEntity phase = phaseRepository.findById(phaseId);
+        return new PhaseDsResponseModel(
+                phase.getId(),
+                phase.getRank(),
+                phase.getTitle()
+        );
     }
 }

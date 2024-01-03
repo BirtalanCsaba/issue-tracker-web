@@ -100,9 +100,9 @@ public class KanbanRepositoryImpl extends BaseRepositoryProvider<KanbanEntity, L
 
     @Override
     public long getPhaseCount(Long kanbanId) {
-        String query = "select count(k.phase) from KanbanEntity k where k.id=:kanbanId";
-        TypedQuery<Long> typedQuery = em.createQuery(query, Long.class);
+        String query = "select count(p) from PhaseEntity p where p.kanban.id=:kanbanId";
+        Query typedQuery = em.createQuery(query);
         typedQuery.setParameter("kanbanId", kanbanId);
-        return typedQuery.getSingleResult();
+        return (long) typedQuery.getSingleResult();
     }
 }

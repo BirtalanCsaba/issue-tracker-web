@@ -40,6 +40,7 @@ public class KanbanInteractor implements KanbanManagerInput {
                 response.getId(),
                 response.getTitle(),
                 response.getDescription(),
+                response.getOwnerId(),
                 response.getAdmins(),
                 response.getParticipants()
         );
@@ -65,6 +66,7 @@ public class KanbanInteractor implements KanbanManagerInput {
                         k.getId(),
                         k.getTitle(),
                         k.getDescription(),
+                        k.getOwnerId(),
                         k.getAdmins(),
                         k.getParticipants(),
                         k.getRole()
@@ -108,13 +110,16 @@ public class KanbanInteractor implements KanbanManagerInput {
         } else {
             PhaseDsResponseModel firstPhase = kanbanDsGateway.findFirstPhase(kanbanId);
             int bucket = getBucket(firstPhase.getRank());
+            String newRank = String.valueOf(bucket) + "|" + BaseConversionUtil.MAX_VALUE;
             createdPhase = kanbanDsGateway.addPhase(new CreatePhaseRequestModel(
                     kanbanId,
-                    bucket + "|" + BaseConversionUtil.MIN_VALUE,
+                    newRank,
                     title
             ));
             reIndex(kanbanId);
         }
+
+        createdPhase = kanbanDsGateway.findPhaseById(createdPhase.getId());
 
         return new PhaseResponseModel(
                 createdPhase.getId(),
@@ -130,11 +135,12 @@ public class KanbanInteractor implements KanbanManagerInput {
         int nextBucket = getNextBucket(currentBucket);
 
         List<PhaseDsResponseModel> phases;
-        if (currentBucket >= 2) {
-            phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
-        } else {
-            phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.DESCENDING);
-        }
+
+//        if (currentBucket >= 2) {
+        phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
+//        } else {
+//            phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
+//        }
 
         long rankingSize = phases.size();
 
@@ -142,10 +148,11 @@ public class KanbanInteractor implements KanbanManagerInput {
 
         int index = 0;
         for (String defaultRank : BaseConversionUtil.DEFAULT_RANKS) {
-            if (index >= phases.size()) {
+            if (index >= phases.size() || index < 0) {
                 break;
             }
-            phases.get(index).setRank(nextBucket + '|' + defaultRank);
+            String newRank = String.valueOf(nextBucket) + "|" + defaultRank;
+            phases.get(index).setRank(newRank);
             index++;
         }
 
@@ -155,6 +162,32 @@ public class KanbanInteractor implements KanbanManagerInput {
                 p.getTitle()
         )).toList();
         kanbanDsGateway.updatePhases(updatePhases);
+    }
+
+    @Override
+    public KanbanResponseModel findById(Long kanbanId) {
+        var response = kanbanDsGateway.findById(kanbanId);
+        return new KanbanResponseModel(
+                response.getId(),
+                response.getTitle(),
+                response.getDescription(),
+                response.getOwnerId(),
+                response.getAdmins(),
+                response.getParticipants()
+        );
+    }
+
+    @Override
+    public KanbanCompleteResponseModel findCompleteById(Long kanbanId) {
+        var response = kanbanDsGateway.findCompleteById(kanbanId);
+        return new KanbanCompleteResponseModel(
+                response.getId(),
+                response.getTitle(),
+                response.getDescription(),
+                response.getAdmins(),
+                response.getParticipants(),
+                response.getOwner()
+        );
     }
 
     private String getRank(String value) {

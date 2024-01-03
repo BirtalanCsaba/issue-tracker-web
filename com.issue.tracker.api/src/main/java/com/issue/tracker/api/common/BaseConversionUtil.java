@@ -54,7 +54,7 @@ public class BaseConversionUtil {
         DEFAULT_RANKS.add(MIN_VALUE);
 
         long curr = 0;
-        for (int i = 0; i < DEFAULT_RANKING_SIZE - 1; i++) {
+        for (int i = 0; i < rankingSize - 1; i++) {
             curr = curr + rankingStep;
             String strValue = BaseConversionUtil.convertBase10to43(curr);
             DEFAULT_RANKS.add(strValue);

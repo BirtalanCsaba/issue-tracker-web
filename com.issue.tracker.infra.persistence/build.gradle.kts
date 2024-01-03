@@ -6,6 +6,7 @@ plugins {
 
 dependencies {
     implementation(project(":com.issue.tracker.api.persistence"))
+    implementation(project(":com.issue.tracker.api"))
     implementation(project(":com.issue.tracker.infra"))
 
     compileOnly(libs.jakarta.ee)
