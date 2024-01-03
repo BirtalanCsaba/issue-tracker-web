@@ -50,6 +50,9 @@ public class KanbanEntity extends BaseEntity<Long> {
     @JoinColumn(name = "owner_id", nullable = false)
     private UserEntity owner;
 
+    @OneToMany(mappedBy = "kanban")
+    private List<PhaseEntity> phase;
+
     public KanbanEntity() {
     }
 
@@ -138,5 +141,13 @@ public class KanbanEntity extends BaseEntity<Long> {
 
     public void setOwner(UserEntity owner) {
         this.owner = owner;
+    }
+
+    public List<PhaseEntity> getPhase() {
+        return phase;
+    }
+
+    public void setPhase(List<PhaseEntity> phase) {
+        this.phase = phase;
     }
 }

@@ -1,7 +1,6 @@
 package com.issue.tracker.infra.persistence.kanban;
 
 import com.issue.tracker.infra.persistence.user.BaseRepository;
-import com.issue.tracker.infra.persistence.user.UserEntity;
 import jakarta.ejb.Local;
 
 import java.util.List;
@@ -19,4 +18,6 @@ public interface KanbanRepository extends BaseRepository<KanbanEntity, Long> {
     boolean isAdmin(Long userId, Long kanbanId);
 
     boolean isParticipant(Long userId, Long kanbanId);
+
+    long getPhaseCount(Long kanbanId);
 }

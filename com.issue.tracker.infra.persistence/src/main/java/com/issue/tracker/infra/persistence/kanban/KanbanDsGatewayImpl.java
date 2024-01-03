@@ -1,18 +1,15 @@
 package com.issue.tracker.infra.persistence.kanban;
 
-import com.issue.tracker.api.persistence.auth.AuthDsGateway;
+import com.issue.tracker.api.persistence.common.OrderingType;
 import com.issue.tracker.api.persistence.kanban.*;
 import com.issue.tracker.infra.persistence.user.UserEntity;
-import com.issue.tracker.infra.persistence.user.UserEntity_;
 import com.issue.tracker.infra.persistence.user.UserRepository;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -26,6 +23,9 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
 
     @EJB
     private UserRepository userRepository;
+
+    @EJB
+    private PhaseRepository phaseRepository;
 
     @Override
     public KanbanDsResponseModel create(CreateKanbanDsRequestModel kanban) {
@@ -138,8 +138,6 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
             ));
         }
 
-        // Retrieve where user is owner
-        // TODO: create a named entity graph
         List<KanbanEntity> whereOwner = kanbanRepository.findOwningKanbans(userId);
         for (var kanban : whereOwner) {
             result.add(new EnrolledKanbanDsResponseModel(
@@ -168,11 +166,95 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
 
     @Override
     public boolean isParticipant(Long userId, Long kanbanId) {
-        return kanbanRepository.isAdmin(userId, kanbanId);
+        return kanbanRepository.isParticipant(userId, kanbanId);
     }
 
     @Override
     public void removeById(Long id) {
         kanbanRepository.removeById(id);
+    }
+
+    @Override
+    public long getPhaseCount(Long kanbanId) {
+        return kanbanRepository.getPhaseCount(kanbanId);
+    }
+
+    @Override
+    public void updatePhase(Long phaseId, String title, String rank) {
+        String jpqlUpdate = "UPDATE PhaseEntity e SET e.title = :title, e.rank = :rank WHERE e.id = :id";
+
+        Query query = em.createQuery(jpqlUpdate)
+                .setParameter("id", phaseId)
+                .setParameter("title", title)
+                .setParameter("rank", rank);
+
+        int updatedEntities = query.executeUpdate();
+    }
+
+    @Override
+    public PhaseDsResponseModel findFirstPhase(Long kanbanId) {
+        PhaseEntity result = phaseRepository.findFirstPhaseForKanban(kanbanId);
+        return new PhaseDsResponseModel(
+                result.getId(),
+                result.getRank(),
+                result.getTitle()
+        );
+    }
+
+    @Override
+    public List<PhaseDsResponseModel> findAllPhasesForKanban(Long kanbanId) {
+
+    }
+
+    @Override
+    public List<PhaseDsResponseModel> findAllPhasesForKanbanOrdered(Long kanbanId, OrderingType order) {
+        List<PhaseEntity> result = phaseRepository.findAllPhasesForKanbanOrdered(kanbanId, order);
+        return result.stream().map(p -> new PhaseDsResponseModel(
+                p.getId(),
+                p.getRank(),
+                p.getTitle()
+        )).toList();
+    }
+
+    @Override
+    public PhaseDsResponseModel addPhase(CreatePhaseRequestModel phase) {
+        KanbanEntity kanban = kanbanRepository.findById(phase.getKanbanId());
+        PhaseEntity createdPhase = phaseRepository.save(new PhaseEntity(
+                phase.getRank(),
+                kanban,
+                phase.getTitle()
+        ));
+        return new PhaseDsResponseModel(
+                createdPhase.getId(),
+                createdPhase.getRank(),
+                createdPhase.getTitle()
+                );
+    }
+
+    @Override
+    public void updatePhases(List<UpdatePhaseRequestModel> phases) {
+        try {
+        em.getTransaction().begin();
+
+        String query = "update PhaseEntity p set p.title=:title, p.rank=:rank where p.id=:phaseId";
+
+        long count = 0;
+        for (var phase : phases) {
+            if (count >= 100) {
+                count = 0;
+                em.getTransaction().commit();
+            }
+            Query theQuery = em.createQuery(query);
+            theQuery.setParameter("title", phase.getTitle());
+            theQuery.setParameter("rank", phase.getRank());
+            theQuery.executeUpdate();
+            count++;
+        }
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+        }
     }
 }

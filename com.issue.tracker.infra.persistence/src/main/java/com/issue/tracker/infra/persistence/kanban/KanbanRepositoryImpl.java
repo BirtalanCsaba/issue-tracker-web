@@ -82,7 +82,7 @@ public class KanbanRepositoryImpl extends BaseRepositoryProvider<KanbanEntity, L
 
     @Override
     public boolean isAdmin(Long userId, Long kanbanId) {
-        String query = "select ku from KanbanUserEntity ku where ku.id.kanbanId=:kanbanId and ku.id.userId=:userId and ku.role = 'ADMIN'";
+        String query = "select count(ku) > 0 from KanbanUserEntity ku where ku.id.kanbanId=:kanbanId and ku.id.userId=:userId and ku.role = 'ADMIN'";
         TypedQuery<Boolean> typedQuery = em.createQuery(query, Boolean.class);
         typedQuery.setParameter("userId", userId);
         typedQuery.setParameter("kanbanId", kanbanId);
@@ -94,6 +94,14 @@ public class KanbanRepositoryImpl extends BaseRepositoryProvider<KanbanEntity, L
         String query = "select ku from KanbanUserEntity ku where ku.id.kanbanId=:kanbanId and ku.id.userId=:userId and ku.role = 'PARTICIPANT'";
         TypedQuery<Boolean> typedQuery = em.createQuery(query, Boolean.class);
         typedQuery.setParameter("userId", userId);
+        typedQuery.setParameter("kanbanId", kanbanId);
+        return typedQuery.getSingleResult();
+    }
+
+    @Override
+    public long getPhaseCount(Long kanbanId) {
+        String query = "select count(k.phase) from KanbanEntity k where k.id=:kanbanId";
+        TypedQuery<Long> typedQuery = em.createQuery(query, Long.class);
         typedQuery.setParameter("kanbanId", kanbanId);
         return typedQuery.getSingleResult();
     }

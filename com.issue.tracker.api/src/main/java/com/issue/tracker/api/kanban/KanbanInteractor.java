@@ -2,6 +2,8 @@ package com.issue.tracker.api.kanban;
 
 import com.issue.tracker.api.ApiException;
 import com.issue.tracker.api.auth.UserNotAuthorizedException;
+import com.issue.tracker.api.common.BaseConversionUtil;
+import com.issue.tracker.api.persistence.common.OrderingType;
 import com.issue.tracker.api.persistence.kanban.*;
 import com.issue.tracker.domain.kanban.BaseKanbanFactory;
 import com.issue.tracker.domain.kanban.Kanban;
@@ -78,5 +80,97 @@ public class KanbanInteractor implements KanbanManagerInput {
             throw new UserNotAuthorizedException("User with id: " + userId + " is not the owner of the kanban with id: " + kanbanId);
         }
         kanbanDsGateway.removeById(kanbanId);
+    }
+
+    @Override
+    public PhaseResponseModel addPhase(Long userId, Long kanbanId, String title) {
+        if (kanbanId == null) {
+            throw new ApiException("Kanban ID is null");
+        }
+        if (userId == null) {
+            throw new ApiException("User ID is null");
+        }
+        if (!kanbanDsGateway.isOwner(userId, kanbanId)) {
+            if (!kanbanDsGateway.isAdmin(userId, kanbanId)) {
+                throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + kanbanId);
+            }
+        }
+
+        long phaseCount = kanbanDsGateway.getPhaseCount(kanbanId);
+
+        PhaseDsResponseModel createdPhase;
+        if (phaseCount == 0) {
+            createdPhase = kanbanDsGateway.addPhase(new CreatePhaseRequestModel(
+                    kanbanId,
+                    "0|" + BaseConversionUtil.MIN_VALUE,
+                    title
+            ));
+        } else {
+            PhaseDsResponseModel firstPhase = kanbanDsGateway.findFirstPhase(kanbanId);
+            int bucket = getBucket(firstPhase.getRank());
+            createdPhase = kanbanDsGateway.addPhase(new CreatePhaseRequestModel(
+                    kanbanId,
+                    bucket + "|" + BaseConversionUtil.MIN_VALUE,
+                    title
+            ));
+            reIndex(kanbanId);
+        }
+
+        return new PhaseResponseModel(
+                createdPhase.getId(),
+                createdPhase.getRank(),
+                createdPhase.getTitle()
+        );
+    }
+
+    @Override
+    public void reIndex(Long kanbanId) {
+        PhaseDsResponseModel phase = kanbanDsGateway.findFirstPhase(kanbanId);
+        int currentBucket = getBucket(phase.getRank());
+        int nextBucket = getNextBucket(currentBucket);
+
+        List<PhaseDsResponseModel> phases;
+        if (currentBucket >= 2) {
+            phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
+        } else {
+            phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.DESCENDING);
+        }
+
+        long rankingSize = phases.size();
+
+        BaseConversionUtil.calculateDefaultRanks(rankingSize);
+
+        int index = 0;
+        for (String defaultRank : BaseConversionUtil.DEFAULT_RANKS) {
+            if (index >= phases.size()) {
+                break;
+            }
+            phases.get(index).setRank(nextBucket + '|' + defaultRank);
+            index++;
+        }
+
+        List<UpdatePhaseRequestModel> updatePhases = phases.stream().map(p -> new UpdatePhaseRequestModel(
+                p.getId(),
+                p.getRank(),
+                p.getTitle()
+        )).toList();
+        kanbanDsGateway.updatePhases(updatePhases);
+    }
+
+    private String getRank(String value) {
+        String[] tokens = value.split("\\|");
+        return tokens[1];
+    }
+
+    private int getBucket(String rank) {
+        String[] tokens = rank.split("\\|");
+        return Integer.parseInt(tokens[0]);
+    }
+
+    private int getNextBucket(int currentBucket) {
+        if (currentBucket >= 2) {
+            return 0;
+        }
+        return currentBucket + 1;
     }
 }

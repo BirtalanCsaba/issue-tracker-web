@@ -2,9 +2,7 @@ package com.issue.tracker.infra.web.kanban;
 
 import com.issue.tracker.api.auth.AuthInput;
 import com.issue.tracker.api.auth.UserNotAuthorizedException;
-import com.issue.tracker.api.kanban.CreateKanbanRequestModel;
-import com.issue.tracker.api.kanban.KanbanManagerInput;
-import com.issue.tracker.api.kanban.UpdateKanbanRequestModel;
+import com.issue.tracker.api.kanban.*;
 import com.issue.tracker.api.logger.LogType;
 import com.issue.tracker.api.logger.LoggerBuilder;
 import com.issue.tracker.infra.web.auth.Authenticated;
@@ -107,6 +105,44 @@ public class KanbanManagerRestController {
             var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
             kanbanManager.removeKanbanById(currentAuthenticatedUser.getId(), kanbanId);
             return Response.ok().build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @POST
+    @Path("/phase/{kanbanId}")
+    public Response addPhase(@PathParam("kanbanId") Long kanbanId,
+                             @Context SecurityContext securityContext,
+                             PhaseRequestModel phase) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            PhaseResponseModel createdPhase = kanbanManager.addPhase(
+                    currentAuthenticatedUser.getId(),
+                    kanbanId,
+                    phase.getTitle()
+            );
+            return Response.ok(createdPhase).build();
         } catch (UserNotAuthorizedException ex) {
             loggerBuilder.create(
                             getClass(),

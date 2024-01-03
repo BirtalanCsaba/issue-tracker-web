@@ -13,4 +13,8 @@ public interface KanbanManagerInput {
     List<EnrolledKanbanResponseModel> findAllEnrolledKanbansForUser(Long userId);
 
     void removeKanbanById(Long userId, Long kanbanId);
+
+    PhaseResponseModel addPhase(Long userId, Long kanbanId, String title);
+
+    void reIndex(Long kanbanId);
 }

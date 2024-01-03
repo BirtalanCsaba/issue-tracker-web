@@ -1,5 +1,6 @@
 package com.issue.tracker.api.persistence.kanban;
 
+import com.issue.tracker.api.persistence.common.OrderingType;
 import jakarta.ejb.Remote;
 
 import java.util.List;
@@ -23,4 +24,18 @@ public interface KanbanDsGateway {
     boolean isParticipant(Long userId, Long kanbanId);
 
     void removeById(Long id);
+
+    long getPhaseCount(Long kanbanId);
+
+    void updatePhase(Long phaseId, String title, String rank);
+
+    PhaseDsResponseModel findFirstPhase(Long kanbanId);
+
+    List<PhaseDsResponseModel> findAllPhasesForKanban(Long kanbanId);
+
+    List<PhaseDsResponseModel> findAllPhasesForKanbanOrdered(Long kanbanId, OrderingType order);
+
+    PhaseDsResponseModel addPhase(CreatePhaseRequestModel phase);
+
+    void updatePhases(List<UpdatePhaseRequestModel> phases);
 }
