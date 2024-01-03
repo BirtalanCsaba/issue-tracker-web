@@ -2,14 +2,10 @@ package com.issue.tracker.infra.persistence.user;
 
 import com.issue.tracker.api.persistence.auth.AuthDsGateway;
 import com.issue.tracker.api.persistence.auth.SaveUserRequestModel;
-import com.issue.tracker.api.persistence.auth.UserDsResponseModel;
+import com.issue.tracker.api.persistence.auth.UserDsCompleteResponseModel;
 import com.issue.tracker.infra.security.BCryptManager;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 
 @Stateless
 public class AuthDsGatewayImpl implements AuthDsGateway {
@@ -26,9 +22,9 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
     }
 
     @Override
-    public UserDsResponseModel findByUsername(String username) {
+    public UserDsCompleteResponseModel findByUsername(String username) {
         UserEntity result = userRepository.findByUsername(username);
-        return result != null ? new UserDsResponseModel(
+        return result != null ? new UserDsCompleteResponseModel(
                 result.getId(),
                 result.getFirstName(),
                 result.getLastName(),
@@ -39,7 +35,7 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
     }
 
     @Override
-    public UserDsResponseModel save(SaveUserRequestModel saveUserRequestModel) {
+    public UserDsCompleteResponseModel save(SaveUserRequestModel saveUserRequestModel) {
         String encryptedPassword = BCryptManager.encrypt(saveUserRequestModel.getPassword());
         UserEntity createdUser = userRepository.save(
                 new UserEntity(
@@ -50,7 +46,7 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                         saveUserRequestModel.getEmail()
                 )
         );
-        return new UserDsResponseModel(
+        return new UserDsCompleteResponseModel(
                 createdUser.getId(),
                 createdUser.getFirstName(),
                 createdUser.getLastName(),
@@ -61,9 +57,9 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
     }
 
     @Override
-    public UserDsResponseModel findById(Long id) {
+    public UserDsCompleteResponseModel findById(Long id) {
         UserEntity result = userRepository.findById(id);
-        return result != null ? new UserDsResponseModel(
+        return result != null ? new UserDsCompleteResponseModel(
                 result.getId(),
                 result.getFirstName(),
                 result.getLastName(),
@@ -74,9 +70,9 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
     }
 
     @Override
-    public UserDsResponseModel findByEmail(String email) {
+    public UserDsCompleteResponseModel findByEmail(String email) {
         UserEntity result = userRepository.findByEmail(email);
-        return result != null ? new UserDsResponseModel(
+        return result != null ? new UserDsCompleteResponseModel(
                 result.getId(),
                 result.getFirstName(),
                 result.getLastName(),

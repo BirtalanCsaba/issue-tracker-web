@@ -9,6 +9,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@NamedEntityGraph(
+        name = "user-participant",
+        attributeNodes = {
+                @NamedAttributeNode("users"),
+                @NamedAttributeNode("owner"),
+        }
+)
 @Entity
 @Table(name = "kanban")
 public class KanbanEntity extends BaseEntity<Long> {

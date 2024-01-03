@@ -96,6 +96,68 @@ public class KanbanManagerRestController {
         }
     }
 
+    @GET
+    @Path("/{kanbanId}")
+    public Response findById(@PathParam("kanbanId") Long kanbanId,
+                             @Context SecurityContext securityContext) {
+        try {
+            return Response.ok(kanbanManager.findById(kanbanId)).build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @GET
+    @Path("/complete/{kanbanId}")
+    public Response findCompleteById(@PathParam("kanbanId") Long kanbanId,
+                             @Context SecurityContext securityContext) {
+        try {
+            return Response.ok(kanbanManager.findCompleteById(kanbanId)).build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
     @DELETE
     @Path("/{kanbanId}")
     public Response delete(

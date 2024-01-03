@@ -6,11 +6,11 @@ import jakarta.ejb.Remote;
 public interface AuthDsGateway {
     boolean existsByUsernameAndPassword(String username, String password);
 
-    UserDsResponseModel findByUsername(String username);
+    UserDsCompleteResponseModel findByUsername(String username);
 
-    UserDsResponseModel save(SaveUserRequestModel saveUserRequestModel);
+    UserDsCompleteResponseModel save(SaveUserRequestModel saveUserRequestModel);
 
-    UserDsResponseModel findById(Long id);
+    UserDsCompleteResponseModel findById(Long id);
 
-    UserDsResponseModel findByEmail(String email);
+    UserDsCompleteResponseModel findByEmail(String email);
 }

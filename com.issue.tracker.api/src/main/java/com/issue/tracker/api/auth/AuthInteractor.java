@@ -2,7 +2,7 @@ package com.issue.tracker.api.auth;
 
 import com.issue.tracker.api.persistence.auth.AuthDsGateway;
 import com.issue.tracker.api.persistence.auth.SaveUserRequestModel;
-import com.issue.tracker.api.persistence.auth.UserDsResponseModel;
+import com.issue.tracker.api.persistence.auth.UserDsCompleteResponseModel;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 
@@ -28,7 +28,7 @@ public class AuthInteractor implements AuthInput, Serializable {
                 registerRequestModel.getEmail()
         );
 
-        UserDsResponseModel createdUser = authDsGateway.save(saveUserRequestModel);
+        UserDsCompleteResponseModel createdUser = authDsGateway.save(saveUserRequestModel);
 
         if (createdUser == null) {
             throw new UserCreationFailedException("User creation failed");
@@ -53,7 +53,7 @@ public class AuthInteractor implements AuthInput, Serializable {
 
     @Override
     public UserResponseModel findByUsername(String username) {
-        UserDsResponseModel theUser = authDsGateway.findByUsername(username);
+        UserDsCompleteResponseModel theUser = authDsGateway.findByUsername(username);
         return new UserResponseModel(
                 theUser.getId(),
                 theUser.getFirstName(),

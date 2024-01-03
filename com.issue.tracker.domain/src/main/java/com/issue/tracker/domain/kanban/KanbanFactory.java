@@ -10,4 +10,9 @@ public interface KanbanFactory {
             List<Long> admins,
             List<Long> participants
     );
+
+    Kanban create(
+            String title,
+            String description
+    );
 }

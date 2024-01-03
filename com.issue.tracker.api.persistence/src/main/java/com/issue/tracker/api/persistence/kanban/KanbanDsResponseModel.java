@@ -23,6 +23,7 @@ public class KanbanDsResponseModel implements Serializable {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.ownerId = ownerId;
         this.admins = admins;
         this.participants = participants;
     }

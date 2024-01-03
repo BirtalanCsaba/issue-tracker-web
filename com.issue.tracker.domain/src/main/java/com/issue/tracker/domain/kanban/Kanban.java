@@ -21,6 +21,11 @@ public class Kanban {
         this.participants = participants;
     }
 
+    public Kanban(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+
     public String getTitle() {
         return title;
     }

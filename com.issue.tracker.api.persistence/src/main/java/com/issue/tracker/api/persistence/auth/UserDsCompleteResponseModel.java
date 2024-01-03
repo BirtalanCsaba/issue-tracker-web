@@ -2,25 +2,24 @@ package com.issue.tracker.api.persistence.auth;
 
 import java.io.Serializable;
 
-public class UserDsResponseModel implements Serializable {
+public class UserDsCompleteResponseModel implements Serializable {
     private Long id;
-
     private String firstName;
-
     private String lastName;
-
     private String username;
-
+    private String password;
     private String email;
 
-    public UserDsResponseModel() {
+    public UserDsCompleteResponseModel() {
+
     }
 
-    public UserDsResponseModel(Long id, String firstName, String lastName, String username, String email) {
+    public UserDsCompleteResponseModel(Long id, String firstName, String lastName, String username, String password, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
+        this.password = password;
         this.email = email;
     }
 
@@ -54,6 +53,14 @@ public class UserDsResponseModel implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEmail() {
