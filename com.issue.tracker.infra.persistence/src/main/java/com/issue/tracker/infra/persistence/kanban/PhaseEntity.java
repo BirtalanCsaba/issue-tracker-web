@@ -48,4 +48,12 @@ public class PhaseEntity extends BaseEntity<Long> {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public KanbanEntity getKanban() {
+        return kanban;
+    }
+
+    public void setKanban(KanbanEntity kanban) {
+        this.kanban = kanban;
+    }
 }

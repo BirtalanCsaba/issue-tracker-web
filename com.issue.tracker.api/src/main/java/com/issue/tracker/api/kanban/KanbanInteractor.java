@@ -3,6 +3,7 @@ package com.issue.tracker.api.kanban;
 import com.issue.tracker.api.ApiException;
 import com.issue.tracker.api.auth.UserNotAuthorizedException;
 import com.issue.tracker.api.common.BaseConversionUtil;
+import com.issue.tracker.api.common.RankUtils;
 import com.issue.tracker.api.persistence.common.OrderingType;
 import com.issue.tracker.api.persistence.kanban.*;
 import com.issue.tracker.domain.kanban.BaseKanbanFactory;
@@ -10,8 +11,11 @@ import com.issue.tracker.domain.kanban.Kanban;
 import com.issue.tracker.domain.kanban.KanbanFactory;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Stateless
 public class KanbanInteractor implements KanbanManagerInput {
@@ -129,6 +133,54 @@ public class KanbanInteractor implements KanbanManagerInput {
     }
 
     @Override
+    public void insertPhaseBetween(Long userId, InsertPhaseRequestModel phaseRequestModel) {
+        var toBeInsertedPhase = kanbanDsGateway.findPhaseById(phaseRequestModel.getToBeInserted());
+        if (toBeInsertedPhase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+
+        if (!kanbanDsGateway.isOwner(userId, toBeInsertedPhase.getKanbanId())) {
+            if (!kanbanDsGateway.isAdmin(userId, toBeInsertedPhase.getKanbanId())) {
+                throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + toBeInsertedPhase.getKanbanId());
+            }
+        }
+
+        var firstPhase = kanbanDsGateway.findPhaseById(phaseRequestModel.getFirstPhase());
+        if (firstPhase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+
+        var secondPhase = kanbanDsGateway.findPhaseById(phaseRequestModel.getSecondPhase());
+        if (secondPhase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+
+        if (!Objects.equals(toBeInsertedPhase.getKanbanId(), firstPhase.getKanbanId()) && toBeInsertedPhase.getKanbanId() != secondPhase.getKanbanId()) {
+            throw new ApiException("Provided phases are not from the same kanban");
+        }
+
+        Optional<String> optionalNewRank = RankUtils.calculateMiddleRank(getRank(firstPhase.getRank()), getRank(secondPhase.getRank()));
+        if (optionalNewRank.isEmpty()) {
+            reIndex(toBeInsertedPhase.getKanbanId());
+
+            // find after reindexing
+            firstPhase = kanbanDsGateway.findPhaseById(phaseRequestModel.getFirstPhase());
+            secondPhase = kanbanDsGateway.findPhaseById(phaseRequestModel.getSecondPhase());
+        }
+
+        // it is for sure good
+        String actualNewRank = RankUtils.calculateMiddleRank(getRank(firstPhase.getRank()), getRank(secondPhase.getRank())).get();
+
+        String newRank = String.valueOf(getBucket(firstPhase.getRank())) + "|" + actualNewRank;
+
+        kanbanDsGateway.updatePhase(
+                toBeInsertedPhase.getId(),
+                toBeInsertedPhase.getTitle(),
+                newRank
+        );
+    }
+
+    @Override
     public void reIndex(Long kanbanId) {
         PhaseDsResponseModel phase = kanbanDsGateway.findFirstPhase(kanbanId);
         int currentBucket = getBucket(phase.getRank());
@@ -183,6 +235,94 @@ public class KanbanInteractor implements KanbanManagerInput {
                 response.getAdmins(),
                 response.getParticipants(),
                 response.getOwner()
+        );
+    }
+
+    @Override
+    @Transactional
+    public void addLastPhase(Long userId, MovePhaseRequestModel phase) {
+        var toBeInsertedPhase = kanbanDsGateway.findPhaseById(phase.getToBeInserted());
+        if (toBeInsertedPhase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+        if (!kanbanDsGateway.isOwner(userId, toBeInsertedPhase.getKanbanId())) {
+            if (!kanbanDsGateway.isAdmin(userId, toBeInsertedPhase.getKanbanId())) {
+                throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + toBeInsertedPhase.getKanbanId());
+            }
+        }
+        var lastPhase = kanbanDsGateway.findLastPhase(toBeInsertedPhase.getKanbanId());
+        if (Objects.equals(lastPhase.getId(), toBeInsertedPhase.getId())) {
+            return;
+        }
+
+        Optional<String> optionalNewRank = RankUtils.calculateMiddleRank(
+                getRank(lastPhase.getRank()),
+                BaseConversionUtil.MAX_VALUE
+        );
+        if (optionalNewRank.isEmpty()) {
+            reIndex(toBeInsertedPhase.getKanbanId());
+            // find after reindexing
+            lastPhase = kanbanDsGateway.findLastPhase(toBeInsertedPhase.getKanbanId());
+        }
+
+        // this time is for sure good
+        String actualNewRank = RankUtils.calculateMiddleRank(
+                getRank(lastPhase.getRank()),
+                BaseConversionUtil.MAX_VALUE
+        ).get();
+
+        String newRank = String.valueOf(getBucket(lastPhase.getRank())) + '|' + actualNewRank;
+
+        kanbanDsGateway.updatePhase(
+                toBeInsertedPhase.getId(),
+                toBeInsertedPhase.getTitle(),
+                newRank
+        );
+    }
+
+    @Override
+    @Transactional
+    public void addFirstPhase(Long userId, MovePhaseRequestModel phase) {
+        var toBeInsertedPhase = kanbanDsGateway.findPhaseById(phase.getToBeInserted());
+        if (toBeInsertedPhase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+        if (!kanbanDsGateway.isOwner(userId, toBeInsertedPhase.getKanbanId())) {
+            if (!kanbanDsGateway.isAdmin(userId, toBeInsertedPhase.getKanbanId())) {
+                throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + toBeInsertedPhase.getKanbanId());
+            }
+        }
+        var firstPhase = kanbanDsGateway.findFirstPhase(toBeInsertedPhase.getKanbanId());
+        if (Objects.equals(firstPhase.getId(), toBeInsertedPhase.getId())) {
+            return;
+        }
+        var secondPhase = kanbanDsGateway.findNthPhase(toBeInsertedPhase.getKanbanId(), 1);
+        if (secondPhase == null) {
+            return;
+        }
+        kanbanDsGateway.updatePhase(
+                toBeInsertedPhase.getId(),
+                toBeInsertedPhase.getTitle(),
+                firstPhase.getRank()
+        );
+        Optional<String> newFirstPhaseRankOptional = RankUtils.calculateMiddleRank(
+                getRank(firstPhase.getRank()),
+                getRank(secondPhase.getRank())
+        );
+        if (newFirstPhaseRankOptional.isEmpty()) {
+            reIndex(toBeInsertedPhase.getKanbanId());
+        }
+
+        String newFirstPhaseRank = RankUtils.calculateMiddleRank(
+                getRank(firstPhase.getRank()),
+                getRank(secondPhase.getRank())
+        ).get();
+
+        String firstPhaseCompleteRank = String.valueOf(getBucket(secondPhase.getRank())) + '|' + newFirstPhaseRank;
+        kanbanDsGateway.updatePhase(
+                firstPhase.getId(),
+                firstPhase.getTitle(),
+                firstPhaseCompleteRank
         );
     }
 

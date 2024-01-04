@@ -16,10 +16,15 @@ public interface KanbanManagerInput {
 
     PhaseResponseModel addPhase(Long userId, Long kanbanId, String title);
 
+    void insertPhaseBetween(Long userId, InsertPhaseRequestModel phaseRequestModel);
+
     void reIndex(Long kanbanId);
 
     KanbanResponseModel findById(Long kanbanId);
 
     KanbanCompleteResponseModel findCompleteById(Long kanbanId);
 
+    void addLastPhase(Long userId, MovePhaseRequestModel phase);
+
+    void addFirstPhase(Long userId, MovePhaseRequestModel phase);
 }

@@ -31,7 +31,11 @@ public interface KanbanDsGateway {
 
     void updatePhase(Long phaseId, String title, String rank);
 
+    PhaseDsResponseModel findNthPhase(Long kanbanId, int index);
+
     PhaseDsResponseModel findFirstPhase(Long kanbanId);
+
+    PhaseDsResponseModel findLastPhase(Long kanbanId);
 
     List<PhaseDsResponseModel> findAllPhasesForKanban(Long kanbanId);
 

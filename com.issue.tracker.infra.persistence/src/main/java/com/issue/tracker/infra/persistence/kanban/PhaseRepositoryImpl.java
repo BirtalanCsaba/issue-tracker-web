@@ -58,7 +58,7 @@ public class PhaseRepositoryImpl extends BaseRepositoryProvider<PhaseEntity, Lon
     public PhaseEntity findFirstPhaseForKanban(Long kanbanId) {
         try {
             TypedQuery<PhaseEntity> query = em.createQuery(
-                    "SELECT e FROM PhaseEntity e where e.kanban.id=:kanbanId ORDER BY e.rank DESC", PhaseEntity.class);
+                    "SELECT e FROM PhaseEntity e where e.kanban.id=:kanbanId ORDER BY e.rank ASC", PhaseEntity.class);
 
             query.setParameter("kanbanId", kanbanId);
             query.setMaxResults(1);
@@ -70,11 +70,12 @@ public class PhaseRepositoryImpl extends BaseRepositoryProvider<PhaseEntity, Lon
     }
 
     @Override
-    public PhaseEntity getNthElemAfterSort(long index) {
-        String jpqlQuery = "SELECT e FROM PhaseEntity e ORDER BY e.rank";
+    public PhaseEntity getNthElemAfterSort(Long kanbanId, long index) {
+        String jpqlQuery = "SELECT e FROM PhaseEntity e where e.kanban.id=:kanbanId ORDER BY e.rank";
 
         // Create a query and set the ordering and limits
         TypedQuery<PhaseEntity> query = em.createQuery(jpqlQuery, PhaseEntity.class)
+                .setParameter("kanbanId", kanbanId)
                 .setFirstResult((int) index)  // Adjusting for 0-based indexing
                 .setMaxResults(1);
 

@@ -12,7 +12,7 @@ public interface PhaseRepository extends BaseRepository<PhaseEntity, Long> {
 
     PhaseEntity findFirstPhaseForKanban(Long kanbanId);
 
-    PhaseEntity getNthElemAfterSort(long index);
+    PhaseEntity getNthElemAfterSort(Long kanbanId, long index);
 
     List<PhaseEntity> findAllPhasesForKanbanOrdered(Long kanbanId, OrderingType order);
 }

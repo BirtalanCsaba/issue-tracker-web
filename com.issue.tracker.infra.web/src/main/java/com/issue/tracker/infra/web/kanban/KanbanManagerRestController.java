@@ -130,7 +130,7 @@ public class KanbanManagerRestController {
     @GET
     @Path("/complete/{kanbanId}")
     public Response findCompleteById(@PathParam("kanbanId") Long kanbanId,
-                             @Context SecurityContext securityContext) {
+                                     @Context SecurityContext securityContext) {
         try {
             return Response.ok(kanbanManager.findCompleteById(kanbanId)).build();
         } catch (UserNotAuthorizedException ex) {
@@ -205,6 +205,120 @@ public class KanbanManagerRestController {
                     phase.getTitle()
             );
             return Response.ok(createdPhase).build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @POST
+    @Path("/phase/insert")
+    public Response insertPhaseBetween(
+            @Context SecurityContext securityContext,
+            InsertPhaseRequestModel phase
+    ) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            kanbanManager.insertPhaseBetween(
+                    currentAuthenticatedUser.getId(),
+                    phase
+            );
+            return Response.ok().build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @POST
+    @Path("/phase/addLast")
+    public Response addLastPhase(
+            @Context SecurityContext securityContext,
+            MovePhaseRequestModel phase
+    ) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            kanbanManager.addLastPhase(
+                    currentAuthenticatedUser.getId(),
+                    phase
+            );
+            return Response.ok().build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @POST
+    @Path("/phase/addFirst")
+    public Response addFirstPhase(
+            @Context SecurityContext securityContext,
+            MovePhaseRequestModel phase
+    ) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            kanbanManager.addFirstPhase(
+                    currentAuthenticatedUser.getId(),
+                    phase
+            );
+            return Response.ok().build();
         } catch (UserNotAuthorizedException ex) {
             loggerBuilder.create(
                             getClass(),

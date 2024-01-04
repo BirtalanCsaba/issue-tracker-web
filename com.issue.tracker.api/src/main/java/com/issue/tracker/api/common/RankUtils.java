@@ -3,7 +3,7 @@ package com.issue.tracker.api.common;
 import java.util.Optional;
 
 public class RankUtils {
-    public Optional<String> calculateMiddleRank(String first, String second) {
+    public static Optional<String> calculateMiddleRank(String first, String second) {
         long firstRank = BaseConversionUtil.convertBase43to10(first);
         long secondRank = BaseConversionUtil.convertBase43to10(second);
 

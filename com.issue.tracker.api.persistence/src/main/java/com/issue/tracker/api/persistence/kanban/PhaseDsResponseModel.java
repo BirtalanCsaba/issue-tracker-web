@@ -9,14 +9,25 @@ public class PhaseDsResponseModel implements Serializable {
 
     private String title;
 
+    private Long kanbanId;
+
     public PhaseDsResponseModel() {
 
     }
 
-    public PhaseDsResponseModel(Long id, String rank, String title) {
+    public PhaseDsResponseModel(Long id, String rank, String title, Long kanbanId) {
         this.id = id;
         this.rank = rank;
         this.title = title;
+        this.kanbanId = kanbanId;
+    }
+
+    public Long getKanbanId() {
+        return kanbanId;
+    }
+
+    public void setKanbanId(Long kanbanId) {
+        this.kanbanId = kanbanId;
     }
 
     public Long getId() {

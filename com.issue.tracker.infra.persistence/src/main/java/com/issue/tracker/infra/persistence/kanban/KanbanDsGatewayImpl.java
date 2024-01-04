@@ -244,13 +244,46 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     }
 
     @Override
+    public PhaseDsResponseModel findNthPhase(Long kanbanId, int index) {
+        var response = phaseRepository.getNthElemAfterSort(kanbanId, index);
+        if (response == null) {
+            return null;
+        }
+        return new PhaseDsResponseModel(
+                response.getId(),
+                response.getRank(),
+                response.getTitle(),
+                response.getKanban().getId()
+        );
+    }
+
+    @Override
     @Transactional
     public PhaseDsResponseModel findFirstPhase(Long kanbanId) {
         PhaseEntity result = phaseRepository.findFirstPhaseForKanban(kanbanId);
+        if (result == null) {
+            return null;
+        }
         return new PhaseDsResponseModel(
                 result.getId(),
                 result.getRank(),
-                result.getTitle()
+                result.getTitle(),
+                result.getKanban().getId()
+        );
+    }
+
+    @Override
+    @Transactional
+    public PhaseDsResponseModel findLastPhase(Long kanbanId) {
+        PhaseEntity result = phaseRepository.findLastPhaseForKanban(kanbanId);
+        if (result == null) {
+            return null;
+        }
+        return new PhaseDsResponseModel(
+                result.getId(),
+                result.getRank(),
+                result.getTitle(),
+                result.getKanban().getId()
         );
     }
 
@@ -261,7 +294,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
         return result.stream().map(p -> new PhaseDsResponseModel(
                 p.getId(),
                 p.getRank(),
-                p.getTitle()
+                p.getTitle(),
+                p.getKanbanId()
         )).toList();
     }
 
@@ -272,7 +306,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
         return result.stream().map(p -> new PhaseDsResponseModel(
                 p.getId(),
                 p.getRank(),
-                p.getTitle()
+                p.getTitle(),
+                p.getKanban().getId()
         )).toList();
     }
 
@@ -288,7 +323,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
         return new PhaseDsResponseModel(
                 createdPhase.getId(),
                 createdPhase.getRank(),
-                createdPhase.getTitle()
+                createdPhase.getTitle(),
+                createdPhase.getKanban().getId()
         );
     }
 
@@ -321,8 +357,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 // Handle rollback exception if necessary
                 LoggerBuilderImpl loggerBuilder = new LoggerBuilderImpl();
                 loggerBuilder.create(getClass(), LogType.ERROR, rollbackException.getMessage())
-                .build()
-                .print();
+                        .build()
+                        .print();
             }
 
             // Handle the original exception
@@ -339,7 +375,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
         return new PhaseDsResponseModel(
                 phase.getId(),
                 phase.getRank(),
-                phase.getTitle()
+                phase.getTitle(),
+                phase.getKanban().getId()
         );
     }
 }
