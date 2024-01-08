@@ -17,16 +17,27 @@ public class KanbanCompleteResponseModel {
 
     private UserDsResponseModel owner;
 
+    private List<CompletePhaseResponseModel> phase;
+
     public KanbanCompleteResponseModel() {
     }
 
-    public KanbanCompleteResponseModel(Long id, String title, String description, List<UserDsResponseModel> admins, List<UserDsResponseModel> participants, UserDsResponseModel owner) {
+    public KanbanCompleteResponseModel(
+            Long id,
+            String title,
+            String description,
+            List<UserDsResponseModel> admins,
+            List<UserDsResponseModel> participants,
+            UserDsResponseModel owner,
+            List<CompletePhaseResponseModel> phase
+    ) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.admins = admins;
         this.participants = participants;
         this.owner = owner;
+        this.phase = phase;
     }
 
     public Long getId() {
@@ -75,5 +86,13 @@ public class KanbanCompleteResponseModel {
 
     public void setOwner(UserDsResponseModel owner) {
         this.owner = owner;
+    }
+
+    public List<CompletePhaseResponseModel> getPhase() {
+        return phase;
+    }
+
+    public void setPhase(List<CompletePhaseResponseModel> phase) {
+        this.phase = phase;
     }
 }

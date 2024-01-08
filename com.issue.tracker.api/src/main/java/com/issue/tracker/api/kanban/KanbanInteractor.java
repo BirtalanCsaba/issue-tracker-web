@@ -13,6 +13,7 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.transaction.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -234,7 +235,22 @@ public class KanbanInteractor implements KanbanManagerInput {
                 response.getDescription(),
                 response.getAdmins(),
                 response.getParticipants(),
-                response.getOwner()
+                response.getOwner(),
+                response.getPhase().stream().map(p -> new CompletePhaseResponseModel(
+                        p.getId(),
+                        p.getRank(),
+                        p.getTitle(),
+                        p.getKanbanId(),
+                        p.getIssueDsResponseModel().stream().map(i -> new IssueResponseModel(
+                                i.getId(),
+                                i.getTitle(),
+                                i.getDescription(),
+                                i.getPriority(),
+                                i.getCreationTimestamp(),
+                                i.getExpectedDeadline(),
+                                i.getPhaseId()
+                        )).toList()
+                )).toList()
         );
     }
 
@@ -323,6 +339,55 @@ public class KanbanInteractor implements KanbanManagerInput {
                 firstPhase.getId(),
                 firstPhase.getTitle(),
                 firstPhaseCompleteRank
+        );
+    }
+
+    @Override
+    public List<PhaseResponseModel> findAllPhasesInOrder(Long userId, Long kanbanId) {
+        if (!kanbanDsGateway.isOwner(userId, kanbanId)) {
+            if (!kanbanDsGateway.isAdmin(userId, kanbanId)) {
+                if (!kanbanDsGateway.isParticipant(userId, kanbanId)) {
+                    throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + kanbanId);
+                }
+            }
+        }
+        List<PhaseDsResponseModel> phases = kanbanDsGateway.findAllPhasesForKanbanOrdered(kanbanId, OrderingType.ASCENDING);
+        return phases.stream().map(p -> new PhaseResponseModel(
+                p.getId(),
+                p.getRank(),
+                p.getTitle()
+        )).toList();
+    }
+
+    @Override
+    public IssueResponseModel createIssue(Long userId, CreateIssueRequestModel issueRequestModel) {
+        var phase = kanbanDsGateway.findPhaseById(issueRequestModel.getPhaseId());
+        if (phase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+        if (!kanbanDsGateway.isOwner(userId, phase.getKanbanId())) {
+            if (!kanbanDsGateway.isAdmin(userId, phase.getKanbanId())) {
+                if (!kanbanDsGateway.isParticipant(userId, phase.getKanbanId())) {
+                    throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + phase.getKanbanId());
+                }
+            }
+        }
+        var createdIssue = kanbanDsGateway.createIssue(new CreateIssueDsRequestModel(
+                issueRequestModel.getTitle(),
+                issueRequestModel.getDescription(),
+                issueRequestModel.getPriority(),
+                new Date(),
+                issueRequestModel.getExpectedDeadline(),
+                issueRequestModel.getPhaseId()
+        ));
+        return new IssueResponseModel(
+                createdIssue.getId(),
+                createdIssue.getTitle(),
+                createdIssue.getDescription(),
+                createdIssue.getPriority(),
+                createdIssue.getCreationTimestamp(),
+                createdIssue.getExpectedDeadline(),
+                createdIssue.getPhaseId()
         );
     }
 

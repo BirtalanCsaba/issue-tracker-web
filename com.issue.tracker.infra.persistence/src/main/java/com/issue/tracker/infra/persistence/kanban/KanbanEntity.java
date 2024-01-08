@@ -26,18 +26,6 @@ public class KanbanEntity extends BaseEntity<Long> {
     private String description;
 
     @OneToMany(
-            fetch = FetchType.LAZY,
-            mappedBy = "kanban",
-            cascade = {
-                    CascadeType.DETACH,
-                    CascadeType.MERGE,
-                    CascadeType.PERSIST,
-                    CascadeType.REFRESH,
-            }
-    )
-    private List<IssueEntity> issues = new ArrayList<>();
-
-    @OneToMany(
             mappedBy = "kanban",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
@@ -116,14 +104,6 @@ public class KanbanEntity extends BaseEntity<Long> {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public List<IssueEntity> getIssues() {
-        return issues;
-    }
-
-    public void setIssues(List<IssueEntity> issues) {
-        this.issues = issues;
     }
 
     public List<KanbanUserEntity> getUsers() {

@@ -19,16 +19,27 @@ public class KanbanDsCompleteResponseModel implements Serializable {
 
     private UserDsResponseModel owner;
 
+    private List<CompletePhaseDsResponseModel> phase;
+
     public KanbanDsCompleteResponseModel() {
     }
 
-    public KanbanDsCompleteResponseModel(Long id, String title, String description, List<UserDsResponseModel> admins, List<UserDsResponseModel> participants, UserDsResponseModel owner) {
+    public KanbanDsCompleteResponseModel(
+            Long id,
+            String title,
+            String description,
+            List<UserDsResponseModel> admins,
+            List<UserDsResponseModel> participants,
+            UserDsResponseModel owner,
+            List<CompletePhaseDsResponseModel> phase
+    ) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.admins = admins;
         this.participants = participants;
         this.owner = owner;
+        this.phase = phase;
     }
 
     public Long getId() {
@@ -77,5 +88,13 @@ public class KanbanDsCompleteResponseModel implements Serializable {
 
     public void setOwner(UserDsResponseModel owner) {
         this.owner = owner;
+    }
+
+    public List<CompletePhaseDsResponseModel> getPhase() {
+        return phase;
+    }
+
+    public void setPhase(List<CompletePhaseDsResponseModel> phase) {
+        this.phase = phase;
     }
 }

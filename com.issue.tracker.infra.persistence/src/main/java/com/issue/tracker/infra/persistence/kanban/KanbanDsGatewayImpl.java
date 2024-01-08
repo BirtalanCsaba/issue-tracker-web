@@ -36,6 +36,9 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     @EJB
     private PhaseRepository phaseRepository;
 
+    @EJB
+    private IssueRepository issueRepository;
+
     @Override
     @Transactional
     public KanbanDsResponseModel create(CreateKanbanDsRequestModel kanban) {
@@ -136,7 +139,22 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                         kanban.getOwner().getLastName(),
                         kanban.getOwner().getUsername(),
                         kanban.getOwner().getEmail()
-                )
+                ),
+                kanban.getPhase().stream().map(p -> new CompletePhaseDsResponseModel(
+                        p.getId(),
+                        p.getRank(),
+                        p.getTitle(),
+                        p.getKanban().getId(),
+                        p.getIssues().stream().map(i -> new IssueDsResponseModel(
+                                i.getId(),
+                                i.getTitle(),
+                                i.getDescription(),
+                                i.getPriority(),
+                                i.getCreationTimestamp(),
+                                i.getExpectedDeadline(),
+                                i.getPhase().getId()
+                        )).toList()
+                )).toList()
         );
     }
 
@@ -377,6 +395,31 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 phase.getRank(),
                 phase.getTitle(),
                 phase.getKanban().getId()
+        );
+    }
+
+    @Override
+    @Transactional
+    public IssueDsResponseModel createIssue(CreateIssueDsRequestModel issueDsRequestModel) {
+        PhaseEntity thePhase = phaseRepository.findById(issueDsRequestModel.getPhaseId());
+        if (thePhase == null) {
+            return null;
+        }
+        IssueEntity createdIssue = issueRepository.save(new IssueEntity(
+                issueDsRequestModel.getTitle(),
+                issueDsRequestModel.getDescription(),
+                issueDsRequestModel.getPriority(),
+                issueDsRequestModel.getExpectedDeadline(),
+                thePhase
+        ));
+        return new IssueDsResponseModel(
+                createdIssue.getId(),
+                createdIssue.getTitle(),
+                createdIssue.getDescription(),
+                createdIssue.getPriority(),
+                createdIssue.getCreationTimestamp(),
+                createdIssue.getExpectedDeadline(),
+                createdIssue.getPhase().getId()
         );
     }
 }

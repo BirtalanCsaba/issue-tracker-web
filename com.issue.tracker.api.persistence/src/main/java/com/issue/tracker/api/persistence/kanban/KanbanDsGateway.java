@@ -46,4 +46,6 @@ public interface KanbanDsGateway {
     void updatePhases(List<UpdatePhaseRequestModel> phases);
 
     PhaseDsResponseModel findPhaseById(Long phaseId);
+
+    IssueDsResponseModel createIssue(CreateIssueDsRequestModel issueDsRequestModel);
 }

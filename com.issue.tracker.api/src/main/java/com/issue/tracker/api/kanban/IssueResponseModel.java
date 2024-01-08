@@ -1,8 +1,9 @@
 package com.issue.tracker.api.kanban;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class IssueResponseModel {
+public class IssueResponseModel implements Serializable {
     private Long id;
 
     private String title;
@@ -15,13 +16,16 @@ public class IssueResponseModel {
 
     private Date expectedDeadline;
 
-    public IssueResponseModel(Long id, String title, String description, int priority, Date creationTimestamp, Date expectedDeadline) {
+    private Long phaseId;
+
+    public IssueResponseModel(Long id, String title, String description, int priority, Date creationTimestamp, Date expectedDeadline, Long phaseId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.creationTimestamp = creationTimestamp;
         this.expectedDeadline = expectedDeadline;
+        this.phaseId = phaseId;
     }
 
     public IssueResponseModel() {
@@ -73,5 +77,13 @@ public class IssueResponseModel {
 
     public void setExpectedDeadline(Date expectedDeadline) {
         this.expectedDeadline = expectedDeadline;
+    }
+
+    public Long getPhaseId() {
+        return phaseId;
+    }
+
+    public void setPhaseId(Long phaseId) {
+        this.phaseId = phaseId;
     }
 }
