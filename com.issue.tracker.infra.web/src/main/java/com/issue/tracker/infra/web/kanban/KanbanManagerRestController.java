@@ -97,6 +97,26 @@ public class KanbanManagerRestController {
     }
 
     @GET
+    public Response findAllForUser(@Context SecurityContext securityContext) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            return Response.ok(kanbanManager.findAllEnrolledKanbansForUser(
+                    currentAuthenticatedUser.getId())
+            ).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Cannot get kanbans for user");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @GET
     @Path("/{kanbanId}")
     public Response findById(@PathParam("kanbanId") Long kanbanId,
                              @Context SecurityContext securityContext) {
