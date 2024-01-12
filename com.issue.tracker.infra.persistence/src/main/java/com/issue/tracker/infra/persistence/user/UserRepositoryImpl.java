@@ -2,6 +2,8 @@ package com.issue.tracker.infra.persistence.user;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.NoResultException;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 
 import java.util.List;
@@ -57,6 +59,14 @@ public class UserRepositoryImpl extends BaseRepositoryProvider<UserEntity, Long>
         Predicate predicate = root.get("id").in(userIds);
         query.where(predicate);
         return em.createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<UserEntity> findAllOtherUsers(Long exceptUserId) {
+        String queryString = "select u from UserEntity u where u.id<>:userId";
+        TypedQuery<UserEntity> query = em.createQuery(queryString, UserEntity.class);
+        query.setParameter("userId", exceptUserId);
+        return query.getResultList();
     }
 
     @Override

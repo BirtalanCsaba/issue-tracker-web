@@ -13,4 +13,6 @@ public interface UserRepository extends BaseRepository<UserEntity, Long> {
     UserEntity findByEmail(String email);
 
     List<UserEntity> findAllUsersWithIds(List<Long> userIds);
+
+    List<UserEntity> findAllOtherUsers(Long exceptUserId);
 }
