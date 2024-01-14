@@ -26,27 +26,28 @@ public class IssueEntity extends BaseEntity<Long> {
     private Date expectedDeadline;
 
     @ManyToOne
-    @JoinColumn(name="kanban_id", nullable=false)
-    private KanbanEntity kanban;
+    @JoinColumn(name="phase_id", nullable=false)
+    private PhaseEntity phase;
 
     public IssueEntity() {
     }
 
-    public IssueEntity(Long aLong, String title, String description, Integer priority, Date expectedDeadline) {
-        super(aLong);
+    public IssueEntity(String title, String description, Integer priority, Date expectedDeadline, PhaseEntity phase) {
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.expectedDeadline = expectedDeadline;
+        this.phase = phase;
     }
 
-    public IssueEntity(Long aLong, String title, String description, Integer priority, Date creationTimestamp, Date expectedDeadline) {
+    public IssueEntity(Long aLong, String title, String description, Integer priority, Date creationTimestamp, Date expectedDeadline, PhaseEntity phase) {
         super(aLong);
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.creationTimestamp = creationTimestamp;
         this.expectedDeadline = expectedDeadline;
+        this.phase = phase;
     }
 
     public String getTitle() {
@@ -89,11 +90,11 @@ public class IssueEntity extends BaseEntity<Long> {
         this.expectedDeadline = expectedDeadline;
     }
 
-    public KanbanEntity getKanban() {
-        return kanban;
+    public PhaseEntity getPhase() {
+        return phase;
     }
 
-    public void setKanban(KanbanEntity kanban) {
-        this.kanban = kanban;
+    public void setPhase(PhaseEntity phase) {
+        this.phase = phase;
     }
 }

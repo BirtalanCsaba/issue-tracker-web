@@ -27,4 +27,8 @@ public interface KanbanManagerInput {
     void addLastPhase(Long userId, MovePhaseRequestModel phase);
 
     void addFirstPhase(Long userId, MovePhaseRequestModel phase);
+
+    List<PhaseResponseModel> findAllPhasesInOrder(Long userId, Long kanbanId);
+
+    IssueResponseModel createIssue(Long userId, CreateIssueRequestModel issueRequestModel);
 }

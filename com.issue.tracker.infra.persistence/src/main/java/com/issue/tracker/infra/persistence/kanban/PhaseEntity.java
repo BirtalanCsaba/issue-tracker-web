@@ -3,6 +3,9 @@ package com.issue.tracker.infra.persistence.kanban;
 import com.issue.tracker.infra.persistence.common.BaseEntity;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "phase")
 public class PhaseEntity extends BaseEntity<Long> {
@@ -15,6 +18,18 @@ public class PhaseEntity extends BaseEntity<Long> {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "kanban_id", nullable = false)
     private KanbanEntity kanban;
+
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            mappedBy = "phase",
+            cascade = {
+                    CascadeType.DETACH,
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST,
+                    CascadeType.REFRESH,
+            }
+    )
+    private List<IssueEntity> issues = new ArrayList<>();
 
     public PhaseEntity() {
 
@@ -55,5 +70,13 @@ public class PhaseEntity extends BaseEntity<Long> {
 
     public void setKanban(KanbanEntity kanban) {
         this.kanban = kanban;
+    }
+
+    public List<IssueEntity> getIssues() {
+        return issues;
+    }
+
+    public void setIssues(List<IssueEntity> issues) {
+        this.issues = issues;
     }
 }

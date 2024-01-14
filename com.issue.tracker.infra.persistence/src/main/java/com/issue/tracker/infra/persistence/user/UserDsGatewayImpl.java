@@ -20,8 +20,7 @@ public class UserDsGatewayImpl implements UserDsGateway {
                         u.getFirstName(),
                         u.getLastName(),
                         u.getUsername(),
-                        u.getEmail(),
-                        "NONE"
+                        u.getEmail()
                 )
         ).toList();
     }

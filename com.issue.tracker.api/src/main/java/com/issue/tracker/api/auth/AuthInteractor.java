@@ -39,8 +39,7 @@ public class AuthInteractor implements AuthInput, Serializable {
                 createdUser.getFirstName(),
                 createdUser.getLastName(),
                 createdUser.getUsername(),
-                createdUser.getEmail(),
-                createdUser.getRole()
+                createdUser.getEmail()
         );
     }
 
@@ -60,8 +59,7 @@ public class AuthInteractor implements AuthInput, Serializable {
                 theUser.getFirstName(),
                 theUser.getLastName(),
                 theUser.getUsername(),
-                theUser.getEmail(),
-                theUser.getRole()
+                theUser.getEmail()
         );
     }
 }

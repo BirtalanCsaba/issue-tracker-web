@@ -22,8 +22,7 @@ public class UserManagerInteractor implements UserManagerInput, Serializable {
                         u.getFirstName(),
                         u.getLastName(),
                         u.getUsername(),
-                        u.getEmail(),
-                        u.getRole()
+                        u.getEmail()
                 )).toList();
     }
 }

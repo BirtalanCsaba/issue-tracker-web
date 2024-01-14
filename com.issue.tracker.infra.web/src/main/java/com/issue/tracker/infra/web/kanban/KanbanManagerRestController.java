@@ -212,8 +212,42 @@ public class KanbanManagerRestController {
         }
     }
 
+    @GET
+    @Path("/{kanbanId}/phase")
+    public Response getPhasesForKanban(@PathParam("kanbanId") Long kanbanId,
+                                       @Context SecurityContext securityContext) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            var phases = kanbanManager.findAllPhasesInOrder(currentAuthenticatedUser.getId(), kanbanId);
+            return Response.ok(phases).build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+
     @POST
-    @Path("/phase/{kanbanId}")
+    @Path("/{kanbanId}/phase")
     public Response addPhase(@PathParam("kanbanId") Long kanbanId,
                              @Context SecurityContext securityContext,
                              PhaseRequestModel phase) {
@@ -339,6 +373,41 @@ public class KanbanManagerRestController {
                     phase
             );
             return Response.ok().build();
+        } catch (UserNotAuthorizedException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.WARNING,
+                            "User not authorized"
+                    )
+                    .withReason("User should be the owner of the Kanban to perform this action")
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("User not authorized to perform the action");
+            return Response.status(Response.Status.UNAUTHORIZED).entity(errorResponse).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .withStackTrace(Arrays.toString(ex.getStackTrace()))
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Something went wrong");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
+
+    @POST
+    @Path("/issue")
+    public Response createIssue(
+            @Context SecurityContext securityContext,
+            CreateIssueRequestModel issueRequestModel
+            ) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            var createdIssue = kanbanManager.createIssue(currentAuthenticatedUser.getId(), issueRequestModel);
+            return Response.ok(createdIssue).build();
         } catch (UserNotAuthorizedException ex) {
             loggerBuilder.create(
                             getClass(),

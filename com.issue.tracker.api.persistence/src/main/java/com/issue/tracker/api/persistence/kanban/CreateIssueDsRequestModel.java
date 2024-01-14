@@ -1,8 +1,9 @@
 package com.issue.tracker.api.persistence.kanban;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CreateIssueDsRequestModel {
+public class CreateIssueDsRequestModel implements Serializable {
     private String title;
 
     private String description;
@@ -13,15 +14,18 @@ public class CreateIssueDsRequestModel {
 
     private Date expectedDeadline;
 
+    private Long phaseId;
+
     public CreateIssueDsRequestModel() {
     }
 
-    public CreateIssueDsRequestModel(String title, String description, int priority, Date creationTimestamp, Date expectedDeadline) {
+    public CreateIssueDsRequestModel(String title, String description, int priority, Date creationTimestamp, Date expectedDeadline, Long phaseId) {
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.creationTimestamp = creationTimestamp;
         this.expectedDeadline = expectedDeadline;
+        this.phaseId = phaseId;
     }
 
     public String getTitle() {
@@ -62,5 +66,13 @@ public class CreateIssueDsRequestModel {
 
     public void setExpectedDeadline(Date expectedDeadline) {
         this.expectedDeadline = expectedDeadline;
+    }
+
+    public Long getPhaseId() {
+        return phaseId;
+    }
+
+    public void setPhaseId(Long phaseId) {
+        this.phaseId = phaseId;
     }
 }
