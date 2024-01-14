@@ -49,4 +49,23 @@ public class UserRestController {
             return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
         }
     }
+
+    @GET
+    @Path("/userId")
+    public Response findCurrentUserId(@Context SecurityContext securityContext) {
+        try {
+            var currentAuthenticatedUser = authManager.findByUsername(securityContext.getUserPrincipal().getName());
+            return Response.ok(currentAuthenticatedUser).build();
+        } catch (RuntimeException ex) {
+            loggerBuilder.create(
+                            getClass(),
+                            LogType.ERROR,
+                            ex.getMessage()
+                    )
+                    .build()
+                    .print();
+            GenericErrorResponse errorResponse = new GenericErrorResponse("Cannot get user");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
+        }
+    }
 }
