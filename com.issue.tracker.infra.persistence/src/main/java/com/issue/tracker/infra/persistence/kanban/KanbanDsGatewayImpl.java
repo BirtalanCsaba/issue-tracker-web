@@ -152,7 +152,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                                 i.getPriority(),
                                 i.getCreationTimestamp(),
                                 i.getExpectedDeadline(),
-                                i.getPhase().getId()
+                                i.getPhase().getId(),
+                                i.getAssignedUser().getId()
                         )).toList()
                 )).toList()
         );
@@ -405,12 +406,14 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
         if (thePhase == null) {
             return null;
         }
+        UserEntity assignedUser = userRepository.findById(issueDsRequestModel.getAssignedUser());
         IssueEntity createdIssue = issueRepository.save(new IssueEntity(
                 issueDsRequestModel.getTitle(),
                 issueDsRequestModel.getDescription(),
                 issueDsRequestModel.getPriority(),
                 issueDsRequestModel.getExpectedDeadline(),
-                thePhase
+                thePhase,
+                assignedUser
         ));
         return new IssueDsResponseModel(
                 createdIssue.getId(),
@@ -419,7 +422,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 createdIssue.getPriority(),
                 createdIssue.getCreationTimestamp(),
                 createdIssue.getExpectedDeadline(),
-                createdIssue.getPhase().getId()
+                createdIssue.getPhase().getId(),
+                createdIssue.getAssignedUser().getId()
         );
     }
 
@@ -440,7 +444,8 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 response.getPriority(),
                 response.getCreationTimestamp(),
                 response.getExpectedDeadline(),
-                response.getPhase().getId()
+                response.getPhase().getId(),
+                response.getAssignedUser().getId()
         );
     }
 

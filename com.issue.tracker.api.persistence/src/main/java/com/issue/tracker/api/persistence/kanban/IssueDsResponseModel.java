@@ -18,10 +18,21 @@ public class IssueDsResponseModel implements Serializable {
 
     private Long phaseId;
 
+    private Long assignedUser;
+
     public IssueDsResponseModel() {
     }
 
-    public IssueDsResponseModel(Long id, String title, String description, int priority, Date creationTimestamp, Date expectedDeadline, Long phaseId) {
+    public IssueDsResponseModel(
+            Long id,
+            String title,
+            String description,
+            int priority,
+            Date creationTimestamp,
+            Date expectedDeadline,
+            Long phaseId,
+            Long assignedUser
+    ) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -29,6 +40,7 @@ public class IssueDsResponseModel implements Serializable {
         this.creationTimestamp = creationTimestamp;
         this.expectedDeadline = expectedDeadline;
         this.phaseId = phaseId;
+        this.assignedUser = assignedUser;
     }
 
     public Long getId() {
@@ -85,5 +97,13 @@ public class IssueDsResponseModel implements Serializable {
 
     public void setPhaseId(Long phaseId) {
         this.phaseId = phaseId;
+    }
+
+    public Long getAssignedUser() {
+        return assignedUser;
+    }
+
+    public void setAssignedUser(Long assignedUser) {
+        this.assignedUser = assignedUser;
     }
 }

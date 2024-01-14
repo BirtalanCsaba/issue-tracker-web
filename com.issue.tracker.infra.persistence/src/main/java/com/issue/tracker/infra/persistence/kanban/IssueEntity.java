@@ -29,10 +29,20 @@ public class IssueEntity extends BaseEntity<Long> {
     @JoinColumn(name="phase_id", nullable=false)
     private PhaseEntity phase;
 
+    @ManyToOne
+    @JoinColumn(name="assgined_user")
+    private UserEntity assignedUser;
+
     public IssueEntity() {
     }
 
-    public IssueEntity(String title, String description, Integer priority, Date expectedDeadline, PhaseEntity phase) {
+    public IssueEntity(
+            String title,
+            String description,
+            Integer priority,
+            Date expectedDeadline,
+            PhaseEntity phase
+    ) {
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -40,7 +50,31 @@ public class IssueEntity extends BaseEntity<Long> {
         this.phase = phase;
     }
 
-    public IssueEntity(Long aLong, String title, String description, Integer priority, Date creationTimestamp, Date expectedDeadline, PhaseEntity phase) {
+    public IssueEntity(
+            String title,
+            String description,
+            Integer priority,
+            Date expectedDeadline,
+            PhaseEntity phase,
+            UserEntity assignedUser
+    ) {
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+        this.expectedDeadline = expectedDeadline;
+        this.phase = phase;
+        this.assignedUser = assignedUser;
+    }
+
+    public IssueEntity(
+            Long aLong,
+            String title,
+            String description,
+            Integer priority,
+            Date creationTimestamp,
+            Date expectedDeadline,
+            PhaseEntity phase
+    ) {
         super(aLong);
         this.title = title;
         this.description = description;
@@ -96,5 +130,13 @@ public class IssueEntity extends BaseEntity<Long> {
 
     public void setPhase(PhaseEntity phase) {
         this.phase = phase;
+    }
+
+    public UserEntity getAssignedUser() {
+        return assignedUser;
+    }
+
+    public void setAssignedUser(UserEntity assignedUser) {
+        this.assignedUser = assignedUser;
     }
 }

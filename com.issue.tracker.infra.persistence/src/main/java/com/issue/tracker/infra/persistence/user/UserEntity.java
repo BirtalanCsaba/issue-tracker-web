@@ -45,6 +45,14 @@ public class UserEntity extends BaseEntity<Long> {
     )
     private List<KanbanEntity> ownerKanbans;
 
+    @OneToMany(
+            mappedBy = "assignedUser",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<IssueEntity> assignedIssues;
+
     public UserEntity() {
 
     }
@@ -103,5 +111,21 @@ public class UserEntity extends BaseEntity<Long> {
 
     public void setKanbans(List<KanbanUserEntity> kanbans) {
         this.kanbans = kanbans;
+    }
+
+    public List<KanbanEntity> getOwnerKanbans() {
+        return ownerKanbans;
+    }
+
+    public void setOwnerKanbans(List<KanbanEntity> ownerKanbans) {
+        this.ownerKanbans = ownerKanbans;
+    }
+
+    public List<IssueEntity> getAssignedIssues() {
+        return assignedIssues;
+    }
+
+    public void setAssignedIssues(List<IssueEntity> assignedIssues) {
+        this.assignedIssues = assignedIssues;
     }
 }

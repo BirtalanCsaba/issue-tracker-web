@@ -248,7 +248,8 @@ public class KanbanInteractor implements KanbanManagerInput {
                                 i.getPriority(),
                                 i.getCreationTimestamp(),
                                 i.getExpectedDeadline(),
-                                i.getPhaseId()
+                                i.getPhaseId(),
+                                i.getAssignedUser()
                         )).toList()
                 )).toList()
         );
@@ -407,7 +408,8 @@ public class KanbanInteractor implements KanbanManagerInput {
                 issueRequestModel.getPriority(),
                 new Date(),
                 issueRequestModel.getExpectedDeadline(),
-                issueRequestModel.getPhaseId()
+                issueRequestModel.getPhaseId(),
+                issueRequestModel.getAssignedUser()
         ));
         return new IssueResponseModel(
                 createdIssue.getId(),
@@ -416,7 +418,8 @@ public class KanbanInteractor implements KanbanManagerInput {
                 createdIssue.getPriority(),
                 createdIssue.getCreationTimestamp(),
                 createdIssue.getExpectedDeadline(),
-                createdIssue.getPhaseId()
+                createdIssue.getPhaseId(),
+                createdIssue.getAssignedUser()
         );
     }
 

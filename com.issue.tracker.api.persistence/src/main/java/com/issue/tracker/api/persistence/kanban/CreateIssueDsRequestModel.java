@@ -16,16 +16,43 @@ public class CreateIssueDsRequestModel implements Serializable {
 
     private Long phaseId;
 
+    private Long assignedUser;
+
     public CreateIssueDsRequestModel() {
     }
 
-    public CreateIssueDsRequestModel(String title, String description, int priority, Date creationTimestamp, Date expectedDeadline, Long phaseId) {
+    public CreateIssueDsRequestModel(
+            String title,
+            String description,
+            int priority,
+            Date creationTimestamp,
+            Date expectedDeadline,
+            Long phaseId
+    ) {
         this.title = title;
         this.description = description;
         this.priority = priority;
         this.creationTimestamp = creationTimestamp;
         this.expectedDeadline = expectedDeadline;
         this.phaseId = phaseId;
+    }
+
+    public CreateIssueDsRequestModel(
+            String title,
+            String description,
+            int priority,
+            Date creationTimestamp,
+            Date expectedDeadline,
+            Long phaseId,
+            Long assignedUser
+    ) {
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
+        this.creationTimestamp = creationTimestamp;
+        this.expectedDeadline = expectedDeadline;
+        this.phaseId = phaseId;
+        this.assignedUser = assignedUser;
     }
 
     public String getTitle() {
@@ -74,5 +101,13 @@ public class CreateIssueDsRequestModel implements Serializable {
 
     public void setPhaseId(Long phaseId) {
         this.phaseId = phaseId;
+    }
+
+    public Long getAssignedUser() {
+        return assignedUser;
+    }
+
+    public void setAssignedUser(Long assignedUser) {
+        this.assignedUser = assignedUser;
     }
 }
