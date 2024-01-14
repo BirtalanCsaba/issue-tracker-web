@@ -6,6 +6,7 @@ import com.issue.tracker.api.persistence.auth.UserDsResponseModel;
 import com.issue.tracker.api.persistence.common.OrderingType;
 import com.issue.tracker.api.persistence.kanban.*;
 import com.issue.tracker.infra.logger.LoggerBuilderImpl;
+import com.issue.tracker.infra.persistence.common.RoleUtil;
 import com.issue.tracker.infra.persistence.user.UserEntity;
 import com.issue.tracker.infra.persistence.user.UserRepository;
 import jakarta.annotation.Resource;
@@ -121,21 +122,34 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                         p.getFirstName(),
                         p.getLastName(),
                         p.getUsername(),
-                        p.getEmail()
+                        p.getEmail(),
+                        RoleUtil.convertRoleToString(p.getKanbans()
+                                .stream()
+                                .filter(k -> Objects.equals(k.getId().getKanbanId(), kanban.getId()))
+                                .findFirst()
+                                .get()
+                                .getRole())
                 )).toList(),
                 kanban.getParticipants().stream().map(p -> new UserDsResponseModel(
                         p.getId(),
                         p.getFirstName(),
                         p.getLastName(),
                         p.getUsername(),
-                        p.getEmail()
+                        p.getEmail(),
+                        RoleUtil.convertRoleToString(p.getKanbans()
+                                .stream()
+                                .filter(k -> Objects.equals(k.getId().getKanbanId(), kanban.getId()))
+                                .findFirst()
+                                .get()
+                                .getRole())
                 )).toList(),
                 new UserDsResponseModel(
                         kanban.getOwner().getId(),
                         kanban.getOwner().getFirstName(),
                         kanban.getOwner().getLastName(),
                         kanban.getOwner().getUsername(),
-                        kanban.getOwner().getEmail()
+                        kanban.getOwner().getEmail(),
+                        "OWNER"
                 )
         );
     }

@@ -13,15 +13,25 @@ public class UserDsResponseModel implements Serializable {
 
     private String email;
 
+    private String role;
+
     public UserDsResponseModel() {
     }
 
-    public UserDsResponseModel(Long id, String firstName, String lastName, String username, String email) {
+    public UserDsResponseModel(
+            Long id,
+            String firstName,
+            String lastName,
+            String username,
+            String email,
+            String role
+    ) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
+        this.role = role;
     }
 
     public Long getId() {
@@ -62,5 +72,13 @@ public class UserDsResponseModel implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

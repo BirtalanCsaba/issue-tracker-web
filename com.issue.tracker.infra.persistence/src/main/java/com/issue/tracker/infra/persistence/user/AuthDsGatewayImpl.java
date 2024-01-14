@@ -30,7 +30,8 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                 result.getLastName(),
                 result.getUsername(),
                 result.getPassword(),
-                result.getEmail()
+                result.getEmail(),
+                "NONE"
         ) : null;
     }
 
@@ -52,7 +53,8 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                 createdUser.getLastName(),
                 createdUser.getUsername(),
                 createdUser.getPassword(),
-                createdUser.getEmail()
+                createdUser.getEmail(),
+                "NONE"
         );
     }
 
@@ -65,7 +67,8 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                 result.getLastName(),
                 result.getUsername(),
                 result.getPassword(),
-                result.getEmail()
+                result.getEmail(),
+                "NONE"
         ) : null;
     }
 
@@ -78,7 +81,8 @@ public class AuthDsGatewayImpl implements AuthDsGateway {
                 result.getLastName(),
                 result.getUsername(),
                 result.getPassword(),
-                result.getEmail()
+                result.getEmail(),
+                "NONE"
         ) : null;
     }
 }
