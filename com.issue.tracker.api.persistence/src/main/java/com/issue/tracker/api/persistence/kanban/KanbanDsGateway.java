@@ -53,5 +53,7 @@ public interface KanbanDsGateway {
 
     IssueDsResponseModel findIssueById(Long issueId);
 
+    void updateIssue(UpdateIssueDsRequestModel updateIssueDsRequestModel);
+
     void deletePhase(Long phaseId);
 }

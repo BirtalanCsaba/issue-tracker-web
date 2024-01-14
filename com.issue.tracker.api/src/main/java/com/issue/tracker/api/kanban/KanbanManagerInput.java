@@ -1,5 +1,6 @@
 package com.issue.tracker.api.kanban;
 
+import com.issue.tracker.api.persistence.kanban.UpdateIssueDsRequestModel;
 import jakarta.ejb.Local;
 
 import java.util.List;
@@ -35,4 +36,6 @@ public interface KanbanManagerInput {
     List<PhaseResponseModel> findAllPhasesInOrder(Long userId, Long kanbanId);
 
     IssueResponseModel createIssue(Long userId, CreateIssueRequestModel issueRequestModel);
+
+    void updateIssue(Long userId, UpdateIssueRequestModel updateIssueRequestModel);
 }

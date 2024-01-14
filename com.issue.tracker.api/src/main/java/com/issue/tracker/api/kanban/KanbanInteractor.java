@@ -423,6 +423,31 @@ public class KanbanInteractor implements KanbanManagerInput {
         );
     }
 
+    @Override
+    public void updateIssue(Long userId, UpdateIssueRequestModel updateIssueRequestModel) {
+        var phase = kanbanDsGateway.findPhaseById(updateIssueRequestModel.getPhaseId());
+        if (phase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+        if (!kanbanDsGateway.isOwner(userId, phase.getKanbanId())) {
+            if (!kanbanDsGateway.isAdmin(userId, phase.getKanbanId())) {
+                if (!kanbanDsGateway.isParticipant(userId, phase.getKanbanId())) {
+                    throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + phase.getKanbanId());
+                }
+            }
+        }
+
+        kanbanDsGateway.updateIssue(new UpdateIssueDsRequestModel(
+                updateIssueRequestModel.getIssueId(),
+                updateIssueRequestModel.getTitle(),
+                updateIssueRequestModel.getDescription(),
+                updateIssueRequestModel.getPriority(),
+                updateIssueRequestModel.getExpectedDeadline(),
+                updateIssueRequestModel.getAssignedUser(),
+                updateIssueRequestModel.getPhaseId()
+        ));
+    }
+
     private String getRank(String value) {
         String[] tokens = value.split("\\|");
         return tokens[1];

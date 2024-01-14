@@ -451,6 +451,44 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
 
     @Override
     @Transactional
+    public void updateIssue(UpdateIssueDsRequestModel updateIssueDsRequestModel) {
+        var issue = issueRepository.findById(updateIssueDsRequestModel.getId());
+        if (issue == null) {
+            return;
+        }
+        issue.setTitle(updateIssueDsRequestModel.getTitle());
+        issue.setDescription(updateIssueDsRequestModel.getDescription());
+
+        UserEntity newAssignedUser = userRepository.findById(
+                updateIssueDsRequestModel.getAssignedUser()
+        );
+        if (newAssignedUser == null) {
+            throw new SomeUsersNotFoundException(
+                    "User with id: " +
+                    updateIssueDsRequestModel.getAssignedUser()
+                    + " not found"
+            );
+        }
+
+        PhaseEntity newPhase = phaseRepository.findById(updateIssueDsRequestModel.getPhaseId());
+        if (newPhase == null) {
+            throw new SomeUsersNotFoundException(
+                    "User with id: " +
+                            updateIssueDsRequestModel.getPhaseId()
+                            + " not found"
+            );
+        }
+
+
+        issue.setAssignedUser(newAssignedUser);
+        issue.setPhase(newPhase);
+        issue.setExpectedDeadline(updateIssueDsRequestModel.getExpectedDeadline());
+        issue.setPriority(updateIssueDsRequestModel.getPriority());
+        issueRepository.update(issue);
+    }
+
+    @Override
+    @Transactional
     public void deletePhase(Long phaseId) {
         phaseRepository.removeById(phaseId);
     }
