@@ -422,4 +422,31 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 createdIssue.getPhase().getId()
         );
     }
+
+    @Override
+    @Transactional
+    public void deleteIssue(Long issueId) {
+        issueRepository.removeById(issueId);
+    }
+
+    @Override
+    @Transactional
+    public IssueDsResponseModel findIssueById(Long issueId) {
+        var response = issueRepository.findById(issueId);
+        return new IssueDsResponseModel(
+                response.getId(),
+                response.getTitle(),
+                response.getDescription(),
+                response.getPriority(),
+                response.getCreationTimestamp(),
+                response.getExpectedDeadline(),
+                response.getPhase().getId()
+        );
+    }
+
+    @Override
+    @Transactional
+    public void deletePhase(Long phaseId) {
+        phaseRepository.removeById(phaseId);
+    }
 }

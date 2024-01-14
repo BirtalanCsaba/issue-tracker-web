@@ -24,6 +24,10 @@ public interface KanbanManagerInput {
 
     KanbanCompleteResponseModel findCompleteById(Long kanbanId);
 
+    void removePhase(Long userId, Long phaseId);
+
+    void removeIssue(Long userId, Long issueId);
+
     void addLastPhase(Long userId, MovePhaseRequestModel phase);
 
     void addFirstPhase(Long userId, MovePhaseRequestModel phase);

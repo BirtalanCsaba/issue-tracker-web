@@ -255,6 +255,35 @@ public class KanbanInteractor implements KanbanManagerInput {
     }
 
     @Override
+    public void removePhase(Long userId, Long phaseId) {
+        var toBeInsertedPhase = kanbanDsGateway.findPhaseById(phaseId);
+        if (toBeInsertedPhase == null) {
+            throw new PhaseNotFoundException("Phase not found");
+        }
+        if (!kanbanDsGateway.isOwner(userId, toBeInsertedPhase.getKanbanId())) {
+            if (!kanbanDsGateway.isAdmin(userId, toBeInsertedPhase.getKanbanId())) {
+                throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + toBeInsertedPhase.getKanbanId());
+            }
+        }
+        kanbanDsGateway.deletePhase(phaseId);
+    }
+
+    @Override
+    public void removeIssue(Long userId, Long issueId) {
+        var issue = kanbanDsGateway.findIssueById(issueId);
+        if (issue == null) {
+            return;
+        }
+        var toBeInsertedPhase = kanbanDsGateway.findPhaseById(issue.getPhaseId());
+        if (!kanbanDsGateway.isOwner(userId, toBeInsertedPhase.getKanbanId())) {
+            if (!kanbanDsGateway.isAdmin(userId, toBeInsertedPhase.getKanbanId())) {
+                throw new UserNotAuthorizedException("User with id: " + userId + " is not the admin of the kanban with id: " + toBeInsertedPhase.getKanbanId());
+            }
+        }
+        kanbanDsGateway.deleteIssue(issueId);
+    }
+
+    @Override
     @Transactional
     public void addLastPhase(Long userId, MovePhaseRequestModel phase) {
         var toBeInsertedPhase = kanbanDsGateway.findPhaseById(phase.getToBeInserted());
