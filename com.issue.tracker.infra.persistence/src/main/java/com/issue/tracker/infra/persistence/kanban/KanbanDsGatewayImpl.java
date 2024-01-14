@@ -423,7 +423,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 createdIssue.getCreationTimestamp(),
                 createdIssue.getExpectedDeadline(),
                 createdIssue.getPhase().getId(),
-                createdIssue.getAssignedUser().getId()
+                createdIssue.getAssignedUser() != null ? createdIssue.getAssignedUser().getId() : null
         );
     }
 
