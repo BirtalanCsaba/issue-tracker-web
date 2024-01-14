@@ -13,9 +13,9 @@ import java.util.Date;
 @Stateless
 @Remote
 public class JWTKeys {
-    private final Long accessTokenExpirationMinutes = 60L;
+    private final Long accessTokenExpirationMinutes = 1000L;
 
-    private final Long refreshTokenExpirationMinutes = 1000L;
+    private final Long refreshTokenExpirationMinutes = 8000L;
 
     private final Algorithm ALGORITHM = Algorithm.HMAC512(SecurityConstants.JWT_KEY);
 
