@@ -137,4 +137,6 @@ public class KanbanEntity extends BaseEntity<Long> {
     public void setPhase(List<PhaseEntity> phase) {
         this.phase = phase;
     }
+
+
 }

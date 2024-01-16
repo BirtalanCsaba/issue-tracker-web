@@ -180,18 +180,21 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
         KanbanEntity updatedKanban = kanbanRepository.findById(kanban.getId());
         updatedKanban.setTitle(kanban.getTitle());
         updatedKanban.setDescription(kanban.getDescription());
-        for (var adminId : kanban.getAdmins()) {
-            var user = userRepository.findById(adminId);
-            if (user != null) {
-                updatedKanban.getParticipants().add(user);
-            }
+
+        List<UserEntity> participantUsers = userRepository.findAllUsersWithIds(kanban.getParticipants());
+        List<UserEntity> adminUsers = userRepository.findAllUsersWithIds(kanban.getAdmins());
+
+        Set<KanbanUserEntity> kanbanUsers = getKanbanUserEntities(participantUsers, adminUsers, updatedKanban);
+
+        if (kanbanUsers.size() != kanban.getParticipants().size() + kanban.getAdmins().size()) { // + 1 for the owner
+            throw new SomeUsersNotFoundException("Some users where not found");
         }
-        for (var participantId : kanban.getParticipants()) {
-            var user = userRepository.findById(participantId);
-            if (user != null) {
-                updatedKanban.getParticipants().add(user);
-            }
+
+        for (var participant : kanbanUsers) {
+            em.merge(participant);
         }
+        em.flush();
+
         kanbanRepository.update(updatedKanban);
     }
 
