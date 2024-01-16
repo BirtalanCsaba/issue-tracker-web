@@ -2,9 +2,10 @@ package com.issue.tracker.api.kanban;
 
 import com.issue.tracker.api.persistence.kanban.KanbanDsResponseModel;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class UpdateKanbanRequestModel {
+public class UpdateKanbanRequestModel implements Serializable {
     private Long id;
 
     private String title;
