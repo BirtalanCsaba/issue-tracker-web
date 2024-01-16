@@ -54,7 +54,9 @@ public class KanbanInteractor implements KanbanManagerInput {
     @Override
     public void update(UpdateKanbanRequestModel kanban, Long userId) {
         if (!kanbanDsGateway.isAdmin(userId, kanban.getId())) {
-            throw new UserNotAuthorizedException("User with id: " + userId + " is not the owner of the kanban with id: " + kanban.getId());
+            if (!kanbanDsGateway.isOwner(userId, kanban.getId())) {
+                throw new UserNotAuthorizedException("User with id: " + userId + " is not the owner of the kanban with id: " + kanban.getId());
+            }
         }
         kanbanDsGateway.update(new UpdateKanbanDsRequestModel(
                 kanban.getId(),
