@@ -1,8 +1,9 @@
 package com.issue.tracker.api.persistence.kanban;
 
 import java.util.Date;
+import java.io.Serializable;
 
-public class UpdateIssueDsRequestModel {
+public class UpdateIssueDsRequestModel implements Serializable{
     private Long id;
 
     private String title;
