@@ -445,7 +445,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 response.getCreationTimestamp(),
                 response.getExpectedDeadline(),
                 response.getPhase().getId(),
-                response.getAssignedUser().getId() != null ? response.getAssignedUser().getId() : null
+                response.getAssignedUser() != null ? response.getAssignedUser().getId() : null
         );
     }
 
@@ -459,15 +459,18 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
         issue.setTitle(updateIssueDsRequestModel.getTitle());
         issue.setDescription(updateIssueDsRequestModel.getDescription());
 
-        UserEntity newAssignedUser = userRepository.findById(
-                updateIssueDsRequestModel.getAssignedUser()
-        );
-        if (newAssignedUser == null) {
-            throw new SomeUsersNotFoundException(
-                    "User with id: " +
+        UserEntity newAssignedUser = null;
+        if (updateIssueDsRequestModel.getAssignedUser() != null) {
+            newAssignedUser = userRepository.findById(
                     updateIssueDsRequestModel.getAssignedUser()
-                    + " not found"
             );
+            if (newAssignedUser == null) {
+                throw new SomeUsersNotFoundException(
+                        "User with id: " +
+                                updateIssueDsRequestModel.getAssignedUser()
+                                + " not found"
+                );
+            }
         }
 
         PhaseEntity newPhase = phaseRepository.findById(updateIssueDsRequestModel.getPhaseId());
@@ -478,7 +481,6 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                             + " not found"
             );
         }
-
 
         issue.setAssignedUser(newAssignedUser);
         issue.setPhase(newPhase);
