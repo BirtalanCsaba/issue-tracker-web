@@ -445,7 +445,7 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
                 response.getCreationTimestamp(),
                 response.getExpectedDeadline(),
                 response.getPhase().getId(),
-                response.getAssignedUser().getId()
+                response.getAssignedUser().getId() != null ? response.getAssignedUser().getId() : null
         );
     }
 
