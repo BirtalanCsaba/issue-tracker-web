@@ -59,7 +59,9 @@ public class KanbanInteractor implements KanbanManagerInput {
         kanbanDsGateway.update(new UpdateKanbanDsRequestModel(
                 kanban.getId(),
                 kanban.getTitle(),
-                kanban.getDescription()
+                kanban.getDescription(),
+                kanban.getAdmins(),
+                kanban.getParticipants()
         ));
     }
 

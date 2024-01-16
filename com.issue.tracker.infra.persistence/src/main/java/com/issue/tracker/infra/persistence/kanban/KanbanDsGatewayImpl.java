@@ -177,11 +177,24 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     @Override
     @Transactional
     public void update(UpdateKanbanDsRequestModel kanban) {
-        kanbanRepository.update(new KanbanEntity(
+        KanbanEntity updatedKanban = new KanbanEntity(
                 kanban.getId(),
                 kanban.getTitle(),
                 kanban.getDescription()
-        ));
+        );
+        for (var adminId : kanban.getAdmins()) {
+            var user = userRepository.findById(adminId);
+            if (user != null) {
+                updatedKanban.getParticipants().add(user);
+            }
+        }
+        for (var participantId : kanban.getParticipants()) {
+            var user = userRepository.findById(participantId);
+            if (user != null) {
+                updatedKanban.getParticipants().add(user);
+            }
+        }
+        kanbanRepository.update(updatedKanban);
     }
 
     @Override
@@ -240,6 +253,10 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     @Override
     @Transactional
     public void removeById(Long id) {
+        KanbanEntity kanban = kanbanRepository.findById(id);
+        for (var phase : kanban.getPhase()) {
+            phaseRepository.removeById(phase.getId());
+        }
         kanbanRepository.removeById(id);
     }
 
