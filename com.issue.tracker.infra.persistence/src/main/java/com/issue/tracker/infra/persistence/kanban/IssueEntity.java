@@ -25,7 +25,11 @@ public class IssueEntity extends BaseEntity<Long> {
     @Column(nullable = false)
     private Date expectedDeadline;
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = {
+                    CascadeType.ALL
+            }
+    )
     @JoinColumn(name="phase_id", nullable=false)
     private PhaseEntity phase;
 

@@ -19,6 +19,11 @@ public class PhaseRepositoryImpl extends BaseRepositoryProvider<PhaseEntity, Lon
 
     @Override
     public void removeById(Long entityId) {
+        String query = "delete from IssueEntity i where i.phase.id=:phaseId";
+        Query theQuery = em.createQuery(query);
+        theQuery.setParameter("phaseId", entityId);
+        theQuery.executeUpdate();
+
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaDelete<PhaseEntity> delete = criteriaBuilder.createCriteriaDelete(PhaseEntity.class);
         Root<PhaseEntity> root = delete.from(PhaseEntity.class);
