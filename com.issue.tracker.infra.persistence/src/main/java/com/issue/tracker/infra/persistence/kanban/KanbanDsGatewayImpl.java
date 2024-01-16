@@ -177,11 +177,9 @@ public class KanbanDsGatewayImpl implements KanbanDsGateway {
     @Override
     @Transactional
     public void update(UpdateKanbanDsRequestModel kanban) {
-        KanbanEntity updatedKanban = new KanbanEntity(
-                kanban.getId(),
-                kanban.getTitle(),
-                kanban.getDescription()
-        );
+        KanbanEntity updatedKanban = kanbanRepository.findById(kanban.getId());
+        updatedKanban.setTitle(kanban.getTitle());
+        updatedKanban.setDescription(kanban.getDescription());
         for (var adminId : kanban.getAdmins()) {
             var user = userRepository.findById(adminId);
             if (user != null) {
